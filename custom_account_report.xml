@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>            
+        <report 
+            auto="False"
+            id="account.account_invoices"
+            model="account.invoice"
+            name="custom.account.invoice"
+            rml="custom_account/report/account_print_invoice.rml"
+            string="Invoices" 
+            usage="default"
+            />
+
+    </data>
+</openerp>

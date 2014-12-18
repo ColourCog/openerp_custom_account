@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <record model="ir.ui.view" id="invoice_form_add_extra_currency">
+      <field name="name">account.invoice.form</field>
+      <field name="model">account.invoice</field>
+      <field name="inherit_id" ref="account.invoice_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//sheet/group/group/div/field[@name='currency_id']" position="after">
+            <field name="extra_currency_id" />
+        </xpath>
+        
+      </field>
+    </record>
+  </data>
+</openerp>
