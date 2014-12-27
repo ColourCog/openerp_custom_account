@@ -28,13 +28,14 @@ from openerp import netsvc
 from openerp import pooler
 from openerp.osv import fields, osv, orm
 from openerp.tools.translate import _
+from openerp.tools.amount_to_text_en import amount_to_text
 
 class account_invoice(osv.osv):
     _inherit='account.invoice'
     _name='account.invoice'
 
     def invoice_print(self, cr, uid, ids, context=None):
-        """This function overloads the default invoice print to make sure we get """
+        """This function overloads the default invoice print """
         res = super(account_invoice, self).invoice_print( cr, uid, ids,context) #self, cr, uid, ids, context)
         res["report_name"] = "custom.account.invoice"
         return res
@@ -56,5 +57,41 @@ class account_invoice(osv.osv):
 
 account_invoice()
 
+class account_voucher(osv.osv):
+    _inherit='account.voucher'
+    _name='account.voucher'
+
+    def _amount_to_text(self, cr, uid, amount, currency_id, context=None):
+        # Currency complete name is not available in res.currency model
+        # Exceptions done here (EUR, USD, BRL) cover 75% of cases
+        # For other currencies, display the currency code
+        currency = self.pool['res.currency'].browse(cr, uid, currency_id, context=context)
+        if currency.name.upper() == 'EUR':
+            currency_name = 'Euro'
+        elif currency.name.upper() == 'USD':
+            currency_name = 'Dollars'
+        elif currency.name.upper() == 'BRL':
+            currency_name = 'reais'
+        elif currency.name.upper() == 'XOF':
+            currency_name = 'Francs CFA'
+        else:
+            currency_name = currency.name
+        #TODO : generic amount_to_text is not ready yet, otherwise language (and country) and currency can be passed
+        #amount_in_word = amount_to_text(amount, context=context)
+        return amount_to_text(amount, currency=currency_name)
+
+    def voucher_print(self, cr, uid, ids, context=None):
+        return {
+            'type': 'ir.actions.report.xml', 
+            'report_name': 'custom.account.voucher',
+            'datas': {
+                    'model':'account.voucher',
+                    'id': ids and ids[0] or False,
+                    'ids': ids and ids or [],
+                    'report_type': 'pdf'
+                },
+            'nodestroy': True
+            }
+account_voucher()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -9,6 +9,18 @@
             rml="custom_account/report/account_print_invoice.rml"
             string="Invoices" 
             usage="default"
+            attachment_use="False"
+            />
+
+        <report 
+            auto="False"
+            id="account.account_vouchers"
+            model="account.voucher"
+            name="custom.account.voucher"
+            rml="custom_account/report/account_print_voucher.rml"
+            string="Vouchers" 
+            usage="default"
+            attachment_use="False"
             />
 
     </data>
