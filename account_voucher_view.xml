@@ -12,5 +12,28 @@
         
       </field>
     </record>
-  </data>
+
+        <!-- Supplier write check view -->
+
+        <record model="ir.ui.view" id="view_vendor_payment_check_form_2">
+            <field name="name">account.voucher.payment.form</field>
+            <field name="model">account.voucher</field>
+            <field name="inherit_id" ref="account_check_writing.view_vendor_payment_check_form" />
+            <field name="arch" type="xml">
+                <field name="allow_check" position="replace">
+                    <field name="allow_check" invisible="1"/>
+                </field>
+                <field name="amount_in_word" position="replace">
+                    <field name="amount_in_word" attrs="{'invisible':[('allow_check','=',False)]}" nolabel="1" colspan="6"/>
+                </field>
+                <field name="number" position="replace">
+                    <field name="number" attrs="{'readonly':[('allow_check','=',False)]}" />
+                </field>
+                <button name="print_check" position="replace">
+                    <button name="print_check" icon="gtk-print" string="Print Check" type="object" attrs="{'invisible':['|',('allow_check','=',False),('state','!=','posted') ]}" class="oe_highlight"/>
+                </button>
+            </field>
+        </record>
+
+    </data>
 </openerp>

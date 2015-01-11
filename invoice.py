@@ -62,9 +62,6 @@ class account_voucher(osv.osv):
     _name='account.voucher'
 
     def _amount_to_text(self, cr, uid, amount, currency_id, context=None):
-        # Currency complete name is not available in res.currency model
-        # Exceptions done here (EUR, USD, BRL) cover 75% of cases
-        # For other currencies, display the currency code
         currency = self.pool['res.currency'].browse(cr, uid, currency_id, context=context)
         if currency.name.upper() == 'EUR':
             currency_name = 'Euro'
@@ -79,6 +76,13 @@ class account_voucher(osv.osv):
         #TODO : generic amount_to_text is not ready yet, otherwise language (and country) and currency can be passed
         #amount_in_word = amount_to_text(amount, context=context)
         return amount_to_text(amount, currency=currency_name)
+
+    def write(self, cr, uid, ids, vals, context=None):
+        voucher_obj = self.pool.get('account.voucher')
+        voucher = voucher_obj.browse(cr, uid, ids, context=context)[0]
+        vals["amount_in_word"] = self._amount_to_text(cr, uid, voucher.amount, voucher.company_id.currency_id.id, context=context)
+        voucher_id = super(account_voucher, self).write(cr, uid, ids, vals, context=context)
+        return voucher_id
 
     def voucher_print(self, cr, uid, ids, context=None):
         return {

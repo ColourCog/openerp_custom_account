@@ -216,8 +216,6 @@
           <!--payments info-->
           <para style="terp_headroom_default_8"><i>Amount Paid (in words)</i></para>
           <para style="terp_default_9"><b>[[ format(o.amount_in_word) ]]</b></para>
-          <para style="terp_headroom_default_8"><i>Payment Method</i></para>
-          <para style="terp_default_9">[[ format(o.journal_id.name) ]]</para>
           <para style="terp_headroom_default_9">[[ (o.name and format(o.name)) or removeParentNode('para') ]]</para>
 
         </td>
@@ -235,7 +233,6 @@
         </td>
       </tr>
     </blockTable>
-    <!--/end balance info-->
     <para style="terp_headroom_default_9">[[ (o.narration and format(o.narration )) or removeParentNode('para') ]]</para>
     <para style="terp_default_Bold_Right_9"><u>Authorised Signature</u></para>
     <para style="terp_default_2">
