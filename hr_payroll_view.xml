@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <record id="custom_view_hr_payslip_form" model="ir.ui.view">
+      <field name="name">hr.payslip.form</field>
+      <field name="model">hr.payslip</field>
+      <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form" />
+      <field name="arch" type="xml">
+        <button name="hr_verify_sheet" position="replace">
+          <button string="Confirm" name="hr_verify_sheet" states="draft" class="oe_highlight" groups="base.group_hr_manager"/>
+        </button>
+        <button name="cancel_sheet" position="replace">
+          <button string="Cancel Payslip" name="cancel_sheet" type="object" states="draft,hr_check,confirm,verify,done" groups="base.group_hr_manager"/>
+        </button>
+      </field>
+    </record>
+
+  </data>
+</openerp>

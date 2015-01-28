@@ -57,45 +57,4 @@ class account_invoice(osv.osv):
 
 account_invoice()
 
-class account_voucher(osv.osv):
-    _inherit='account.voucher'
-    _name='account.voucher'
-
-    def _amount_to_text(self, cr, uid, amount, currency_id, context=None):
-        currency = self.pool['res.currency'].browse(cr, uid, currency_id, context=context)
-        if currency.name.upper() == 'EUR':
-            currency_name = 'Euro'
-        elif currency.name.upper() == 'USD':
-            currency_name = 'Dollars'
-        elif currency.name.upper() == 'BRL':
-            currency_name = 'reais'
-        elif currency.name.upper() == 'XOF':
-            currency_name = 'Francs CFA'
-        else:
-            currency_name = currency.name
-        #TODO : generic amount_to_text is not ready yet, otherwise language (and country) and currency can be passed
-        #amount_in_word = amount_to_text(amount, context=context)
-        return amount_to_text(amount, currency=currency_name)
-
-    def write(self, cr, uid, ids, vals, context=None):
-        voucher_obj = self.pool.get('account.voucher')
-        voucher = voucher_obj.browse(cr, uid, ids, context=context)[0]
-        vals["amount_in_word"] = self._amount_to_text(cr, uid, voucher.amount, voucher.company_id.currency_id.id, context=context)
-        voucher_id = super(account_voucher, self).write(cr, uid, ids, vals, context=context)
-        return voucher_id
-
-    def voucher_print(self, cr, uid, ids, context=None):
-        return {
-            'type': 'ir.actions.report.xml', 
-            'report_name': 'custom.account.voucher',
-            'datas': {
-                    'model':'account.voucher',
-                    'id': ids and ids[0] or False,
-                    'ids': ids and ids or [],
-                    'report_type': 'pdf'
-                },
-            'nodestroy': True
-            }
-account_voucher()
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

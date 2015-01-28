@@ -53,7 +53,7 @@ class account_voucher(report_sxw.rml_parse):
 report_sxw.report_sxw(
     'report.custom.account.voucher',
     'account.voucher',
-    'addons/account_voucher/report/account_voucher_print.rml',
+    'addons/custom_account/report/account_voucher_print.rml',
     parser=account_voucher,header="external"
 )
 
