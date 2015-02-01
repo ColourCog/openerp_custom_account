@@ -1,6 +1,6 @@
 {
     "name" : "Custom Account Invoices",
-    "version" : "1.0", 
+    "version" : "1.1", 
     "category" : "Accounting", 
     "sequence": 60,
     "complexity" : "normal", 

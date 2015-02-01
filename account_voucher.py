@@ -53,11 +53,10 @@ class account_voucher(osv.osv):
         return amount_to_text(amount, currency=currency_name)
 
     def write(self, cr, uid, ids, vals, context=None):
-        voucher_obj = self.pool.get('account.voucher')
-        voucher = voucher_obj.browse(cr, uid, ids, context=context)[0]
-        vals["amount_in_word"] = self._amount_to_text(cr, uid, voucher.amount, voucher.company_id.currency_id.id, context=context)
-        voucher_id = super(account_voucher, self).write(cr, uid, ids, vals, context=context)
-        return voucher_id
+        for voucher in self.browse(cr, uid, ids, context=context):
+            vals["amount_in_word"] = self._amount_to_text(cr, uid, voucher.amount, voucher.company_id.currency_id.id, context=context)
+            voucher_id = super(account_voucher, self).write(cr, uid, [voucher.id], vals, context=context)
+        return ids
 
     def voucher_print(self, cr, uid, ids, context=None):
         return {

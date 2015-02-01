@@ -10,7 +10,7 @@
           <button string="Confirm" name="hr_verify_sheet" states="draft" class="oe_highlight" groups="base.group_hr_manager"/>
         </button>
         <button name="cancel_sheet" position="replace">
-          <button string="Cancel Payslip" name="cancel_sheet" type="object" states="draft,hr_check,confirm,verify,done" groups="base.group_hr_manager"/>
+          <button string="Cancel Payslip" name="cancel_sheet" type="object" states="hr_check,confirm,verify,done,suspended" groups="base.group_hr_manager"/>
         </button>
       </field>
     </record>
