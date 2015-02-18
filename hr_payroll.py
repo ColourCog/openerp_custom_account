@@ -51,6 +51,14 @@ class hr_payslip(osv.osv):
             wf_service.trg_create(uid, 'hr.payslip', payslip.id, cr)            
         return True
 
+    def batch_confirm(self, cr, uid, ids, context=None):
+        wf_service = netsvc.LocalService("workflow")
+        for payslip in self.browse(cr, uid, ids, context=context):
+            if payslip.state == "draft":
+                wf_service.trg_validate(uid, 'hr.payslip', payslip.id, 'hr_verify_sheet', cr)
+                wf_service.trg_validate(uid, 'hr.payslip', payslip.id, 'process_sheet', cr)
+        return ids
+        
 hr_payslip()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -29,6 +29,7 @@ Extra features:
     "data" : [ 
         "account_invoice_view.xml",
         "hr_payroll_view.xml",
+        "hr_payroll_data.xml",
         "account_voucher_view.xml",
         "custom_account_report.xml",
     ], 
