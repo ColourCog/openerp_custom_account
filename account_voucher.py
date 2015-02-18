@@ -109,7 +109,12 @@ class account_voucher(osv.osv):
 
     def _amount_to_text_custom(self, cr, uid, amount, currency_id, partner_id, context=None):
         currency = self.pool['res.currency'].browse(cr, uid, currency_id, context=context)
-        partner = self.pool['res.partner'].browse(cr, uid, partner_id, context=context)
+        lang = 'en_GB'
+        if partner_id:
+            partner = self.pool['res.partner'].browse(cr, uid, partner_id, context=context)
+            if partner.lang:
+                lang = partner.lang
+        
         lang_map = {
             'en_GB': amount_to_text_en,
             'en_US': amount_to_text_en,
@@ -128,7 +133,7 @@ class account_voucher(osv.osv):
             currency_name = currency.name
         #TODO : generic amount_to_text is not ready yet, otherwise language (and country) and currency can be passed
         #amount_in_word = amount_to_text(amount, context=context)
-        return lang_map.get(partner.lang, amount_to_text_en)(amount, currency=currency_name)
+        return lang_map.get(lang, amount_to_text_en)(amount, currency=currency_name)
 
     def onchange_amount(self, cr, uid, ids, amount, rate, partner_id, journal_id, currency_id, ttype, date, payment_rate_currency_id, company_id, context=None):
         """ Inherited - add amount_in_word and allow_check_writting in returned value dictionary """
