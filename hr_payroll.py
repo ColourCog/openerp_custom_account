@@ -33,6 +33,8 @@ from openerp.tools.translate import _
 import openerp.addons.decimal_precision as dp
 
 from openerp.tools.safe_eval import safe_eval as eval
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class hr_payslip(osv.osv):
@@ -49,7 +51,7 @@ class hr_payslip(osv.osv):
             super(hr_payslip, self).cancel_sheet(cr, uid, [payslip.id], context=context)
             wf_service.trg_delete(uid, 'hr.payslip', payslip.id, cr)            
             wf_service.trg_create(uid, 'hr.payslip', payslip.id, cr)            
-        return True
+        return ids
 
     def batch_confirm(self, cr, uid, ids, context=None):
         wf_service = netsvc.LocalService("workflow")
@@ -58,6 +60,25 @@ class hr_payslip(osv.osv):
                 wf_service.trg_validate(uid, 'hr.payslip', payslip.id, 'hr_verify_sheet', cr)
                 wf_service.trg_validate(uid, 'hr.payslip', payslip.id, 'process_sheet', cr)
         return ids
+
+    def copy(self, cr, uid, slip_id, default=None, context=None):
+        """We need to copy the input lines as well"""
+        if not default:
+            default = {}
+        employee_obj = self.pool.get('hr.employee')
+        ttyme = datetime.fromtimestamp(time.mktime(time.strptime(time.strftime('%Y-%m-01'), "%Y-%m-%d")))
+        old_slip = self.browse(cr, uid, slip_id, context=context)
+        employee_id = employee_obj.browse(cr, uid, old_slip.employee_id.id, context=context)
+        default.update({
+            'name': _('Salary Slip of %s for %s') % (employee_id.name, tools.ustr(ttyme.strftime('%B-%Y'))),
+            'date_from': time.strftime('%Y-%m-01'),
+            'date_to': str(datetime.now() + relativedelta.relativedelta(months=+1, day=1, days=-1))[:10],
+            })
+        new_id = super(hr_payslip, self).copy(cr, uid, slip_id, default, context=context)
+        # let's compute the sheet while we're at it
+        self.compute_sheet(cr, uid, [new_id], context=context)
+        return new_id
+
         
 hr_payslip()
 

@@ -1,6 +1,6 @@
 {
-    "name" : "Custom Account Invoices",
-    "version" : "1.1", 
+    "name" : "Custom EIS Modifications",
+    "version" : "2.3", 
     "category" : "Accounting", 
     "sequence": 60,
     "complexity" : "normal", 
@@ -12,11 +12,11 @@
         "account_accountant",
         "account_check_writing",
     ], 
-    "summary" : "Modifies the standard invoice reports", 
+    "summary" : "Modifies standard OpenERP functionality", 
     "description" : """
-Custom Account Invoice
+Custom EIS Modifications
 ========================
-This module overrides or creates printouts for accounting.
+This module overrides or creates extra functionality for the EIS OpenERP instance.
 
 Extra features:
 -------------------------------
@@ -25,6 +25,11 @@ Extra features:
 * payments history in invoice
 * printable Payment Vouchers
 * force cancel button to appear in paid pyslips
+* batch validate payslips
+* batch cancel payslips
+* use current date when duplicating payslip
+* batch duplicate payslips
+* group payslips by month
     """,
     "data" : [ 
         "account_invoice_view.xml",

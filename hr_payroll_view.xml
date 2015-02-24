@@ -15,5 +15,16 @@
       </field>
     </record>
 
+    <record id="custom_view_hr_payslip_filter" model="ir.ui.view">
+        <field name="name">hr.payslip.select</field>
+        <field name="model">hr.payslip</field>
+      <field name="inherit_id" ref="hr_payroll.view_hr_payslip_filter" />
+        <field name="arch" type="xml">
+          <filter name="state" position="after">
+            <filter string="Pay Month" name="date_from" icon="terp-stock_effects-object-colorize" context="{'group_by':'date_from'}"/>
+          </filter>
+        </field>
+    </record>
+
   </data>
 </openerp>

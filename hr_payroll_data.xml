@@ -3,19 +3,60 @@
   <data>
 
     <record id="ir_actions_server_confirm_payslip" model="ir.actions.server">
-            <field name="sequence" eval="5"/>
-            <field name="state">code</field>
             <field name="type">ir.actions.server</field>
             <field name="model_id" ref="model_hr_payslip"/>
-            <field name="code">action = self.batch_confirm(cr, uid, context.get('active_ids', []),  context=context)</field>
-            <field name="condition">True</field>
             <field name="name">Batch Confirm selected Payslips</field>
+            <field name="sequence" eval="5"/>
+            <field name="condition">True</field>
+            <field name="state">code</field>
+            <field name="code">self.batch_confirm(cr, uid, context.get('active_ids', []),  context=context)</field>
         </record>
 
         <record model="ir.values" id="action_batch_confirm_payslip">
             <field name="name">action_batch_confirm_payslip</field>
             <field name="action_id" ref="ir_actions_server_confirm_payslip" />
             <field name="value" eval="'ir.actions.server,' + str(ref('ir_actions_server_confirm_payslip'))" />
+            <field name="key">action</field>
+            <field name="model_id" ref="model_hr_payslip" />
+            <field name="model">hr.payslip</field>
+            <field name="key2">client_action_multi</field>
+        </record>
+
+    <record id="ir_actions_server_cancel_payslip" model="ir.actions.server">
+            <field name="sequence" eval="5"/>
+            <field name="state">code</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_hr_payslip"/>
+            <field name="code">self.cancel_sheet(cr, uid, context.get('active_ids', []),  context=context)</field>
+            <field name="condition">True</field>
+            <field name="name">Batch Cancel selected Payslips</field>
+        </record>
+
+        <record model="ir.values" id="action_batch_cancel_payslip">
+            <field name="name">action_batch_cancel_payslip</field>
+            <field name="action_id" ref="ir_actions_server_cancel_payslip" />
+            <field name="value" eval="'ir.actions.server,' + str(ref('ir_actions_server_cancel_payslip'))" />
+            <field name="key">action</field>
+            <field name="model_id" ref="model_hr_payslip" />
+            <field name="model">hr.payslip</field>
+            <field name="key2">client_action_multi</field>
+        </record>
+
+    <record id="ir_actions_server_duplicate_payslip" model="ir.actions.server">
+            <field name="sequence" eval="5"/>
+            <field name="state">code</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_hr_payslip"/>
+            <field name="code">for id in context.get('active_ids', []): self.copy(cr, uid, id, default=None, context=context)
+            </field>
+            <field name="condition">True</field>
+            <field name="name">Batch Duplicate selected Payslips</field>
+        </record>
+
+        <record model="ir.values" id="action_batch_duplicate_payslip">
+            <field name="name">action_batch_duplicate_payslip</field>
+            <field name="action_id" ref="ir_actions_server_duplicate_payslip" />
+            <field name="value" eval="'ir.actions.server,' + str(ref('ir_actions_server_duplicate_payslip'))" />
             <field name="key">action</field>
             <field name="model_id" ref="model_hr_payslip" />
             <field name="model">hr.payslip</field>
