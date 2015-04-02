@@ -37,13 +37,20 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
+
+class hr_payslip_line(osv.osv):
+    _inherit = 'hr.payslip.line'
+
+    _columns = {
+        'quantity': fields.float('Quantity', digits_compute=dp.get_precision('Account')),
+    }
+hr_payslip_line()
+
 class hr_payslip(osv.osv):
     '''
     Pay Slip
     '''
-
     _inherit = 'hr.payslip'
-
 
     def cancel_sheet(self, cr, uid, ids, context=None):
         wf_service = netsvc.LocalService("workflow")

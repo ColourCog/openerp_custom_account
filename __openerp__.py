@@ -1,6 +1,6 @@
 {
     "name" : "Custom EIS Modifications",
-    "version" : "2.3", 
+    "version" : "2.8", 
     "category" : "Accounting", 
     "sequence": 60,
     "complexity" : "normal", 
@@ -9,6 +9,7 @@
     "depends" : [
         "base", 
         "hr_payroll",
+        "hr_loan",
         "account_accountant",
         "account_check_writing",
     ], 
@@ -30,13 +31,19 @@ Extra features:
 * use current date when duplicating payslip
 * batch duplicate payslips
 * group payslips by month
+* recreate loan workflows
+* modified currencies amount-to-text handling to suppress decimals
+* additional partner mobile number
+* additional partner email and mail sending to all partner emails
     """,
     "data" : [ 
         "account_invoice_view.xml",
         "hr_payroll_view.xml",
         "hr_payroll_data.xml",
+        "hr_loan_data.xml",
         "account_voucher_view.xml",
         "custom_account_report.xml",
+        "partner_view.xml",
     ], 
     "application": False, 
     "installable": True

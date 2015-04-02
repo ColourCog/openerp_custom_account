@@ -28,7 +28,7 @@
             id="hr.payslip_report"
             model="hr.payslip"
             name="custom.payslip"
-            rml="custom_account//report/report_payslip.rml"
+            rml="custom_account/report/report_payslip.rml"
             string="Employee PaySlip" />
 
     </data>

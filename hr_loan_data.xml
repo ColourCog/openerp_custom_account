@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <record id="ir_actions_server_reprocess_loans" model="ir.actions.server">
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_hr_loan"/>
+            <field name="name">Batch Reprocess selected Loans</field>
+            <field name="sequence" eval="5"/>
+            <field name="condition">True</field>
+            <field name="state">code</field>
+            <field name="code">self.batch_reprocess_loan(cr, uid, context.get('active_ids', []),  context=context)</field>
+        </record>
+
+        <record model="ir.values" id="action_batch_reprocess_loans">
+            <field name="name">action_batch_reprocess_loans</field>
+            <field name="action_id" ref="ir_actions_server_reprocess_loans" />
+            <field name="value" eval="'ir.actions.server,' + str(ref('ir_actions_server_reprocess_loans'))" />
+            <field name="key">action</field>
+            <field name="model_id" ref="model_hr_loan" />
+            <field name="model">hr.loan</field>
+            <field name="key2">client_action_multi</field>
+        </record>
+
+
+  </data>
+</openerp>
