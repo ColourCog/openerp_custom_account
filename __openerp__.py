@@ -36,6 +36,8 @@ Extra features:
 * modified currencies amount-to-text handling to suppress decimals
 * additional partner mobile number
 * additional partner email and mail sending to all partner emails
+* use purchase validation date as invoice date
+* validate and pay invoices cash using invoice date
     """,
     "data" : [ 
         "account_invoice_view.xml",
