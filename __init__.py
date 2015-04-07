@@ -5,3 +5,4 @@ import hr_payroll
 import hr_loan
 import partner
 import mail
+import purchase

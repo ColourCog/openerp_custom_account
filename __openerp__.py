@@ -1,6 +1,6 @@
 {
     "name" : "Custom EIS Modifications",
-    "version" : "2.8", 
+    "version" : "2.9", 
     "category" : "Accounting", 
     "sequence": 60,
     "complexity" : "normal", 
@@ -30,6 +30,7 @@ Extra features:
 * batch cancel payslips
 * use current date when duplicating payslip
 * batch duplicate payslips
+* batch confirm purchase orders
 * group payslips by month
 * recreate loan workflows
 * modified currencies amount-to-text handling to suppress decimals
@@ -44,6 +45,7 @@ Extra features:
         "account_voucher_view.xml",
         "custom_account_report.xml",
         "partner_view.xml",
+        "purchase_data.xml",
     ], 
     "application": False, 
     "installable": True

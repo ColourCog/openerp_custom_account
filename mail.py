@@ -61,9 +61,8 @@ class mail_mail(osv.Model):
         elif partner:
             email_to = [formataddr((partner.name, partner.email))]
             if partner.extra_email:
-                _logger.warning("also sending mail to %s" % partner.extra_email)
+                _logger.warning("also sending mail to %s using %s" % (partner.name, partner.extra_email))
                 email_to.append(formataddr((partner.name, partner.extra_email)))
-            _logger.warning("email_to: %s" % email_to)
         else:
             email_to = tools.email_split(mail.email_to)
 
