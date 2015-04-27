@@ -54,41 +54,12 @@ class account_invoice(osv.osv):
     
     def invoice_validate_and_pay_cash(self, cr, uid, ids, context=None):
         if not ids: return []
-        dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'account_voucher', 'view_vendor_receipt_dialog_form')
-
         inv = self.browse(cr, uid, ids[0], context=context)
-
-        wf_service = netsvc.LocalService("workflow")
         if inv.state == "draft":
-            #~ wf_service.trg_validate(uid, 'account.invoice', inv.id, 'invoice_open', cr)
             self.action_date_assign(cr,uid,ids,context)
             self.action_move_create(cr,uid,ids,context=context)
             self.action_number(cr,uid,ids,context)
             self.invoice_validate(cr,uid,ids,context=context)
-        #~ return {
-            #~ 'name':_("Pay Invoice"),
-            #~ 'view_mode': 'form',
-            #~ 'view_id': view_id,
-            #~ 'view_type': 'form',
-            #~ 'res_model': 'account.voucher',
-            #~ 'type': 'ir.actions.act_window',
-            #~ 'nodestroy': True,
-            #~ 'target': 'new',
-            #~ 'domain': '[]',
-            #~ 'context': {
-                #~ 'payment_expected_currency': inv.currency_id.id,
-                #~ 'default_partner_id': self.pool.get('res.partner')._find_accounting_partner(inv.partner_id).id,
-                #~ 'default_amount': inv.type in ('out_refund', 'in_refund') and -inv.residual or inv.residual,
-                #~ 'default_reference': inv.reference and inv.reference or inv.name,
-                #~ 'default_date': inv.date_invoice,
-                #~ 'default_journal_id': self._get_cash_journal(cr,uid,context=context),
-                #~ 'close_after_process': True,
-                #~ 'invoice_type': inv.type,
-                #~ 'invoice_id': inv.id,
-                #~ 'default_type': inv.type in ('out_invoice','out_refund') and 'receipt' or 'payment',
-                #~ 'type': inv.type in ('out_invoice','out_refund') and 'receipt' or 'payment'
-            #~ }
-        #~ }
         return self._create_cash_voucher(cr, uid, ids, context=context)
 
     def _create_cash_voucher(self, cr, uid, ids, context):

@@ -9,6 +9,9 @@
         <xpath expr="//sheet/group/group/div/field[@name='currency_id']" position="after">
             <field name="extra_currency_id" />
         </xpath>
+        <xpath expr="//button[@string='Refund Invoice']" position="replace">
+            <button name="%(account.action_account_invoice_refund)d" type='action' string='Refund Invoice' states='open,proforma2,paid' groups="account.group_account_invoice"/>
+        </xpath>
         
       </field>
     </record>

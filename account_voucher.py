@@ -173,6 +173,8 @@ class account_voucher(osv.osv):
     _name='account.voucher'
 
     def _amount_to_text_custom(self, cr, uid, amount, currency_id, partner_id, context=None):
+        # Let's not deal with negative numbers in text
+        amount = abs(amount)
         currency = self.pool['res.currency'].browse(cr, uid, currency_id, context=context)
         lang = 'en_GB'
         if partner_id:

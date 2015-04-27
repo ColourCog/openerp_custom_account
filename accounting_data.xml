@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+        <menuitem name="Accounting"
+            id="account.menu_finance"
+            groups="group_account_observer,account.group_account_user,account.group_account_manager,account.group_account_invoice"/>
+  </data>
+</openerp>
