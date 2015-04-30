@@ -136,16 +136,17 @@ class hr_payslip_duplicate(osv.osv_memory):
             context = {}
         pool_obj = pooler.get_pool(cr.dbname)
         slip_obj = pool_obj.get('hr.payslip')
-        data_inv = slip_obj.read(cr, uid, context['active_ids'], ['state'], context=context)
+        slips = slip_obj.read(cr, uid, context['active_ids'], ['state'], context=context)
         
         context.update({
             'date_from': self.browse(cr,uid,ids)[0].date_from,
             'date_to': self.browse(cr,uid,ids)[0].date_to,})
         
-        for record in data_inv:
+        for record in slips:
             slip_obj.copy(cr, uid, record['id'], default=None, context=context)
         return {'type': 'ir.actions.act_window_close'}
 
 hr_payslip_duplicate()
+
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -5,5 +5,17 @@
         <menuitem name="Accounting"
             id="account.menu_finance"
             groups="group_account_observer,account.group_account_user,account.group_account_manager,account.group_account_invoice"/>
+        <menuitem name="Point of Sale"
+            id="point_of_sale.menu_point_root"
+            groups="point_of_sale.group_pos_manager,point_of_sale.group_pos_user,group_pos_user_limited"
+            sequence="30"/>
+
+        <menuitem name="Sales"
+            id="base.menu_base_partner"
+            groups="group_sale_salesman_limited,base.group_sale_salesman,base.group_sale_manager"/>
+
+        <menuitem action="sale.action_orders" id="sale.menu_sale_order" parent="base.menu_sales" sequence="5" 
+            groups="group_sale_salesman_limited,base.group_sale_salesman,base.group_sale_manager"/>
+
   </data>
 </openerp>

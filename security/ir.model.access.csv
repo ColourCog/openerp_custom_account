@@ -20,4 +20,62 @@ access_account_account_type_invoice,account.account.type invoice,account.model_a
 access_report_account_receivable_invoice,report.account.receivable.invoice,account.model_report_account_receivable,group_account_observer,1,0,0,0
 access_account_sequence_fiscal_year_invoice,account.sequence.fiscalyear invoice,account.model_account_sequence_fiscalyear,group_account_observer,1,0,0,0
 access_account_financial_report_invoice,account.financial.report invoice,account.model_account_financial_report,group_account_observer,1,0,0,0
-
+access_account_invoice_pos,account.invoice pos user,account.model_account_invoice,group_pos_user_limited,1,0,0,0
+access_account_invoice_line_pos,account.invoice.line pos user,account.model_account_invoice_line,group_pos_user_limited,1,0,0,0
+access_account_invoice_tax_pos,account.invoice.tax pos user,account.model_account_invoice_tax,group_pos_user_limited,1,0,0,0
+access_pos_order,pos.order,point_of_sale.model_pos_order,group_pos_user_limited,1,1,1,1
+access_pos_order_line,pos.order.line,point_of_sale.model_pos_order_line,group_pos_user_limited,1,1,1,1
+access_account_journal_pos_user,account.journal pos_user,account.model_account_journal,group_pos_user_limited,1,0,0,0
+access_account_move_pos_user,account.move pos_user,account.model_account_move,group_pos_user_limited,1,1,1,0
+access_account_account_pos_user,account.account pos_user,account.model_account_account,group_pos_user_limited,1,0,0,0
+access_stock_picking_pos_user,stock.picking pos_user,stock.model_stock_picking,group_pos_user_limited,1,1,1,1
+access_sale_shop_pos_user,sale.shop pos_user,sale.model_sale_shop,group_pos_user_limited,1,0,0,0
+access_stock_move_pos_user,stock.move pos_user,stock.model_stock_move,group_pos_user_limited,1,1,1,1
+access_report_sales_by_user_pos,report.sales.by.user.pos,point_of_sale.model_report_sales_by_user_pos,group_pos_user_limited,1,0,0,0
+access_report_sales_by_user_pos_month,report.sales.by.user.pos.month,point_of_sale.model_report_sales_by_user_pos_month,group_pos_user_limited,1,0,0,0
+access_report_sales_by_margin_pos,report.sales.by.margin.pos,point_of_sale.model_report_sales_by_margin_pos,group_pos_user_limited,1,0,0,0
+access_report_sales_by_margin_pos_month,report.sales.by.margin.pos.month,point_of_sale.model_report_sales_by_margin_pos_month,group_pos_user_limited,1,0,0,0
+access_report_pos_order,report.pos.order,point_of_sale.model_report_pos_order,group_pos_user_limited,1,1,1,1
+access_account_bank_statement,account.bank.statement,account.model_account_bank_statement,group_pos_user_limited,1,1,1,0
+access_account_bank_statement_line,account.bank.statement.line,account.model_account_bank_statement_line,group_pos_user_limited,1,1,1,0
+access_account_period_pos,account.period pos user,account.model_account_period,group_pos_user_limited,1,1,1,0
+access_account_fiscalyear_pos_user,account.fiscalyear user,account.model_account_fiscalyear,group_pos_user_limited,1,1,1,0
+access_account_cashbox_line,account.cashbox.line,account.model_account_cashbox_line,group_pos_user_limited,1,1,1,0
+access_account_journal_cashbox_line,account.cashbox.journal.line,account.model_account_journal_cashbox_line,group_pos_user_limited,1,1,1,0
+access_product_product,product.product,product.model_product_product,group_pos_user_limited,1,0,0,0
+access_product_template_pos_user,product.template pos user,product.model_product_template,group_pos_user_limited,1,0,0,0
+access_account_move_line,account.move.line,account.model_account_move_line,group_pos_user_limited,1,1,1,0
+access_account_journal_period_user,account.journal.period user,account.model_account_journal_period,group_pos_user_limited,1,1,1,1
+access_account_analytic_line,account.analytic.line,analytic.model_account_analytic_line,group_pos_user_limited,1,1,1,0
+access_account_analytic_account,account.analytic.account,analytic.model_account_analytic_account,group_pos_user_limited,1,1,1,0
+access_product_product_supplierinfo_user,product.supplierinfo user,product.model_product_supplierinfo,group_pos_user_limited,1,0,0,0
+access_product_product_packaging_user,product.packaging user,product.model_product_packaging,group_pos_user_limited,1,0,0,0
+access_product_category_pos_user,pos.category user,point_of_sale.model_pos_category,group_pos_user_limited,1,0,0,0
+access_pos_session_user,pos.session user,point_of_sale.model_pos_session,group_pos_user_limited,1,1,1,0
+access_pos_config_user,pos.config user,point_of_sale.model_pos_config,group_pos_user_limited,1,0,0,0
+access_sale_order,sale.order,sale.model_sale_order,group_sale_salesman_limited,1,1,1,0
+access_sale_order_line,sale.order.line,sale.model_sale_order_line,group_sale_salesman_limited,1,1,1,1
+access_account_invoice_tax_salesman,account_invoice_tax salesman,account.model_account_invoice_tax,group_sale_salesman_limited,1,0,0,0
+access_account_invoice_salesman,account_invoice salesman,account.model_account_invoice,group_sale_salesman_limited,1,0,0,0
+access_account_invoice_line_salesman,account_invoice.line salesman,account.model_account_invoice_line,group_sale_salesman_limited,1,0,0,0
+access_account_payment_term_salesman,account_payment_term salesman,account.model_account_payment_term,group_sale_salesman_limited,1,0,0,0
+access_account_analytic_account_salesman,account_analytic_account salesman,analytic.model_account_analytic_account,group_sale_salesman_limited,1,1,1,0
+access_sale_report_salesman,sale.report,sale.model_sale_report,group_sale_salesman_limited,1,1,1,0
+access_ir_property_sales,ir.property.sales,base.model_ir_property,group_sale_salesman_limited,1,1,1,1
+access_sale_account_journal,account.journal sale order.user,account.model_account_journal,group_sale_salesman_limited,1,0,0,0
+access_res_partner_sale_user,res.partner.sale.user,base.model_res_partner,group_sale_salesman_limited,1,0,0,0
+access_product_template_sale_user,product.template sale use,product.model_product_template,group_sale_salesman_limited,1,0,0,0
+access_product_product_sale_user,product.product sale use,product.model_product_product,group_sale_salesman_limited,1,0,0,0
+access_account_fiscalyear_user,account.fiscalyear.user,account.model_account_fiscalyear,group_sale_salesman_limited,1,0,0,0
+access_account_tax_user,account.tax.user,account.model_account_tax,group_sale_salesman_limited,1,0,0,0
+access_ir_attachment_sales,ir.attachment.sales,base.model_ir_attachment,group_sale_salesman_limited,1,1,1,0
+access_res_partner_bank_type_user,res.partner.bank.type.user,base.model_res_partner_bank_type,group_sale_salesman_limited,1,0,0,0
+access_res_partner_bank_type_field_user,res.partner.bank.type.field.user,base.model_res_partner_bank_type_field,group_sale_salesman_limited,1,0,0,0
+access_product_uom_user,product.uom.user,product.model_product_uom,group_sale_salesman_limited,1,0,0,0
+access_product_pricelist_sale_user,product.pricelist.sale.user,product.model_product_pricelist,group_sale_salesman_limited,1,0,0,0
+access_account_account_salesman,account_account salesman,account.model_account_account,group_sale_salesman_limited,1,0,0,0
+access_sale_shop_sale_user,sale.shop.sale.user,sale.model_sale_shop,group_sale_salesman_limited,1,0,0,0
+access_product_supplierinfo_user,product.supplierinfo.user,product.model_product_supplierinfo,group_sale_salesman_limited,1,0,0,0
+access_account_invoice_report_salesman,account.invoice.report salesman,account.model_account_invoice_report,group_sale_salesman_limited,1,0,0,0
+access_account_move_line_salesman,account.move.line invoice,account.model_account_move_line,group_sale_salesman_limited,1,0,0,0
+access_procurement_salesman,procurement.order salesman,procurement.model_procurement_order,group_sale_salesman_limited,1,1,1,0

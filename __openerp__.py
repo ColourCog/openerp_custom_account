@@ -1,6 +1,6 @@
 {
     "name" : "Custom EIS Modifications",
-    "version" : "2.9", 
+    "version" : "3.0", 
     "category" : "Accounting", 
     "sequence": 60,
     "complexity" : "normal", 
@@ -40,6 +40,8 @@ Extra features:
 * use purchase validation date as invoice date
 * validate and pay invoices cash using invoice date
 * create a read-only accounting group
+* create a limited POS group (with read-only rights to accounting)
+* create a limited sale group (with read-only rights to accounting)
     """,
     "data" : [ 
         "security/ir_rule.xml",
