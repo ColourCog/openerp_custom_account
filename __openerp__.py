@@ -1,6 +1,6 @@
 {
     "name" : "Custom EIS Modifications",
-    "version" : "3.0",
+    "version" : "4.0",
     "category" : "Accounting",
     "sequence": 60,
     "complexity" : "normal",
@@ -46,6 +46,7 @@ Extra features:
 * create a limited sale group (with read-only rights to accounting)
 * batch switch invoice date to purchase order date
 * batch validate/pay invoices using the cash method
+* batch switch move line period to effective date period
     """,
     "data" : [
         "security/ir_rule.xml",
@@ -59,7 +60,8 @@ Extra features:
         "custom_account_report.xml",
         "partner_view.xml",
         "purchase_data.xml",
-        "invoice_data.xml",
+        "account_invoice_data.xml",
+        "account_move_line_data.xml",
     ],
     "application": False,
     "installable": True
