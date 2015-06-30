@@ -2,6 +2,7 @@
 
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
+from openerp import netsvc
 
 
 class account_invoice(osv.osv):
@@ -52,19 +53,27 @@ class account_invoice(osv.osv):
                 cr,
                 uid,
                 [inv.id],
-                {'date_invoice': order.date_approve},
+                {'date_invoice': order.date_order},
                 context=context)
         return ids
 
     def invoice_validate_and_pay_cash(self, cr, uid, ids, context=None):
+        wf_service = netsvc.LocalService('workflow')
+        if context is None:
+            context = {}
         if not ids:
             return []
-        inv = self.browse(cr, uid, ids[0], context=context)
-        if inv.state == "draft":
-            self.action_date_assign(cr, uid, ids, context)
-            self.action_move_create(cr, uid, ids, context=context)
-            self.action_number(cr, uid, ids, context)
-            self.invoice_validate(cr, uid, ids, context=context)
+        for inv in self.browse(cr, uid, ids, context=context):
+            if inv.state not in ('draft', 'proforma', 'proforma2'):
+                raise osv.except_osv(
+                    _('Warning!'),
+                    _("Selected invoice(s) cannot be confirmed as they are not in 'Draft' or 'Pro-Forma' state."))
+            wf_service.trg_validate(
+                    uid,
+                    'account.invoice',
+                    inv.id,
+                    'invoice_open',
+                    cr)
         return self._create_cash_voucher(cr, uid, ids, context=context)
 
     def _create_cash_voucher(self, cr, uid, ids, context):
