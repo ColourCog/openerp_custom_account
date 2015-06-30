@@ -1,20 +1,21 @@
 {
     "name" : "Custom EIS Modifications",
-    "version" : "3.0", 
-    "category" : "Accounting", 
+    "version" : "3.0",
+    "category" : "Accounting",
     "sequence": 60,
-    "complexity" : "normal", 
-    "author" : "ColourCog.com", 
-    "website" : "http://colourcog.com", 
+    "complexity" : "normal",
+    "author" : "ColourCog.com",
+    "website" : "http://colourcog.com",
     "depends" : [
-        "base", 
+        "base",
         "hr_payroll",
+        "hr_payroll_account",
         "hr_loan",
         "account_accountant",
         "account_check_writing",
         "point_of_sale",
-    ], 
-    "summary" : "Modifies standard OpenERP functionality", 
+    ],
+    "summary" : "Modifies standard OpenERP functionality",
     "description" : """
 Custom EIS Modifications
 ========================
@@ -45,7 +46,7 @@ Extra features:
 * create a limited sale group (with read-only rights to accounting)
 * batch switch invoice date to purchase order date
     """,
-    "data" : [ 
+    "data" : [
         "security/ir_rule.xml",
         "security/ir.model.access.csv",
         "account_invoice_view.xml",
@@ -58,8 +59,8 @@ Extra features:
         "partner_view.xml",
         "purchase_data.xml",
         "invoice_data.xml",
-    ], 
-    "application": False, 
+    ],
+    "application": False,
     "installable": True
 }
 
