@@ -45,6 +45,7 @@ Extra features:
 * create a limited POS group (with read-only rights to accounting)
 * create a limited sale group (with read-only rights to accounting)
 * batch switch invoice date to purchase order date
+* batch validate/pay invoices using the cash method
     """,
     "data" : [
         "security/ir_rule.xml",
