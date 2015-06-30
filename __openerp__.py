@@ -12,6 +12,7 @@
         "hr_loan",
         "account_accountant",
         "account_check_writing",
+        "point_of_sale",
     ], 
     "summary" : "Modifies standard OpenERP functionality", 
     "description" : """
@@ -42,6 +43,7 @@ Extra features:
 * create a read-only accounting group
 * create a limited POS group (with read-only rights to accounting)
 * create a limited sale group (with read-only rights to accounting)
+* batch switch invoice date to purchase order date
     """,
     "data" : [ 
         "security/ir_rule.xml",
@@ -55,6 +57,7 @@ Extra features:
         "custom_account_report.xml",
         "partner_view.xml",
         "purchase_data.xml",
+        "invoice_data.xml",
     ], 
     "application": False, 
     "installable": True

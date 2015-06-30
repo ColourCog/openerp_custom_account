@@ -1,19 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
   <data>
+
     <record model="ir.ui.view" id="invoice_form_add_extra_currency">
       <field name="name">account.invoice.form</field>
       <field name="model">account.invoice</field>
       <field name="inherit_id" ref="account.invoice_form"/>
       <field name="arch" type="xml">
+        <xpath expr="//header" position="replace">
+            <header>
+                <button name="action_invoice_sent" type="object" string="Send by Email" attrs="{'invisible':['|',('sent','=',True), ('state', '!=', 'open')]}" class="oe_highlight" groups="account.group_account_invoice"/>
+                <button name="invoice_print" string="Print" type="object" attrs="{'invisible':['|',('sent','=',True), ('state', '!=', 'open')]}" class="oe_highlight" groups="account.group_account_invoice"/>
+                <button name="action_invoice_sent" type="object" string="Send by Email" attrs="{'invisible':['|',('sent','=',False), ('state', '!=', 'open')]}" groups="account.group_account_invoice"/>
+                <button name="invoice_print" string="Print Invoice" type="object" attrs="{'invisible':['|',('sent','=',False), ('state', '!=', 'open')]}" groups="account.group_account_invoice"/>
+                <button name="invoice_open" states="draft" string="Validate" class="oe_highlight" groups="base.group_user"/>
+                <button name="invoice_open" states="proforma2" string="Validate" groups="base.group_user"/>
+                <button name="invoice_proforma2" states="draft" string="PRO-FORMA" groups="account.group_proforma_invoices"/>
+                <button name="%(account.action_account_invoice_refund)d" type='action' string='Refund Invoice' states='open,proforma2,paid' groups="account.group_account_invoice"/>
+                <button name="invoice_cancel" states="draft,proforma2,open" string="Cancel Invoice" groups="base.group_no_one"/>
+                <button name="invoice_cancel" string="Force Cancel Invoice" class="oe_highlight"
+                    attrs="{'invisible': ['&amp;', ('state','!=','paid'), ('reconciled','=',False)]}" groups="account.group_account_invoice"/>
+                <button name="action_cancel_draft" states="cancel" string="Reset to Draft" type="object" groups="account.group_account_invoice"/>
+                <button name='%(account.action_account_state_open)d' type='action' string='Re-Open' groups="account.group_account_invoice" attrs="{'invisible':['|', ('state','&lt;&gt;','paid'), ('reconciled', '=', True)]}" help="This button only appears when the state of the invoice is 'paid' (showing that it has been fully reconciled) and auto-computed boolean 'reconciled' is False (depicting that it's not the case anymore). In other words, the invoice has been dereconciled and it does not fit anymore the 'paid' state. You should press this button to re-open it and let it continue its normal process after having resolved the eventual exceptions it may have created."/>
+                <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,open,paid" statusbar_colors='{"proforma":"blue","proforma2":"blue"}'/>
+            </header>
+        </xpath>
         <xpath expr="//sheet/group/group/div/field[@name='currency_id']" position="after">
             <field name="extra_currency_id" />
+            <field name="reconciled" invisible="1"/>
         </xpath>
-        <xpath expr="//button[@string='Refund Invoice']" position="replace">
-            <button name="%(account.action_account_invoice_refund)d" type='action' string='Refund Invoice' states='open,proforma2,paid' groups="account.group_account_invoice"/>
-        </xpath>
-        
+
       </field>
     </record>
+
+    <record model="ir.ui.view" id="invoice_form_add_extra_cancel">
+      <field name="name">account.invoice.supplier.form</field>
+      <field name="model">account.invoice</field>
+      <field name="inherit_id" ref="account.invoice_supplier_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//header" position="replace">
+            <header>
+                <button name="invoice_open" states="draft,proforma2" string="Validate" class="oe_highlight" groups="account.group_account_invoice"/>
+                <button name="%(account.action_account_invoice_refund)d" type='action' string='Refund Invoice' states='open,proforma2,paid' groups="account.group_account_invoice"/>
+                <button name="invoice_cancel" states="draft,proforma2,open" string="Cancel Invoice" groups="base.group_no_one"/>
+                <button name="invoice_cancel" string="Force Cancel Invoice" class="oe_highlight"
+                    attrs="{'invisible': ['&amp;', ('state','!=','paid'), ('reconciled','=',False)]}" groups="account.group_account_invoice"/>
+                <button name="action_cancel_draft" states="cancel" string="Reset to Draft" type="object" groups="account.group_account_invoice"/>
+                <button name='%(account.action_account_state_open)d' type='action' string='Re-Open' groups="account.group_account_invoice" attrs="{'invisible':['|', ('state','&lt;&gt;','paid'), ('reconciled', '=', True)]}" help="This button only appears when the state of the invoice is 'paid' (showing that it has been fully reconciled) and auto-computed boolean 'reconciled' is False (depicting that it's not the case anymore). In other words, the invoice has been dereconciled and it does not fit anymore the 'paid' state. You should press this button to re-open it and let it continue its normal process after having resolved the eventual exceptions it may have created."/>
+                <field name="state" widget="statusbar" statusbar_visible="draft,open,paid" statusbar_colors='{"proforma":"blue","proforma2":"blue"}'/>
+            </header>
+        </xpath>
+
+        <xpath expr="//sheet/group/group/field[@name='currency_id']" position="after">
+            <field name="reconciled" invisible="1"/>
+        </xpath>
+      </field>
+    </record>
+
+
+
+        <record id="view_invoice_customer_limited" model="ir.ui.view">
+            <field name="name">account.invoice.customer.pay</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account_voucher.view_invoice_customer"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='invoice_pay_customer']" position="replace">
+                    <button name="invoice_pay_customer" type="object" string="Register Payment"
+                        attrs="{'invisible': ['|', ('state','!=','open'), ('sent','=',True)]}" groups="account.group_account_invoice"/>
+                </xpath>
+                <xpath expr="//button[@name='invoice_pay_customer'][last()]" position="replace">
+                    <button name="invoice_pay_customer" type="object" string="Register Payment"
+                        attrs="{'invisible': ['|', ('state','!=','open'), ('sent','=',False)]}" class="oe_highlight" groups="account.group_account_invoice"/>
+                </xpath>
+                <field name="date_invoice" position="after">
+                    <field name="sent" invisible="1"/>
+                </field>
+
+            </field>
+        </record>
+        <record id="view_invoice_supplier_limited" model="ir.ui.view">
+            <field name="name">account.invoice.supplier.pay</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account_voucher.view_invoice_supplier"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='invoice_pay_customer']" position="replace">
+                    <button name="invoice_pay_customer" type="object" string="Pay" states="open" class="oe_highlight" groups="account.group_account_invoice"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="invoice_tree_custom" model="ir.ui.view">
+            <field name="name">account.invoice.tree</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_tree"/>
+            <field name="arch" type="xml">
+                <field name="state" position="after">
+                    <field name="reconciled" invisible="1"/>
+                </field>
+            </field>
+        </record>
   </data>
 </openerp>

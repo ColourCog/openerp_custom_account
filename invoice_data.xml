@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <record id="ir_actions_server_change_date" model="ir.actions.server">
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_account_invoice"/>
+            <field name="name">Switch date to Purchase Order</field>
+            <field name="sequence" eval="5"/>
+            <field name="condition">True</field>
+            <field name="state">code</field>
+            <field name="code">self.correct_invoice_date(cr, uid, context.get('active_ids', []),  context=context)</field>
+        </record>
+
+        <record model="ir.values" id="action_batch_change_date">
+            <field name="name">action_batch_change_date</field>
+            <field name="action_id" ref="ir_actions_server_change_date" />
+            <field name="value" eval="'ir.actions.server,' + str(ref('ir_actions_server_change_date'))" />
+            <field name="key">action</field>
+            <field name="model_id" ref="model_account_invoice" />
+            <field name="model">account.invoice</field>
+            <field name="key2">client_action_multi</field>
+        </record>
+
+
+  </data>
+</openerp>
