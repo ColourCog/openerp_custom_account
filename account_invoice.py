@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import logging
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp import netsvc
+_logger = logging.getLogger(__name__)
 
 
 class account_invoice(osv.osv):
@@ -37,6 +39,59 @@ class account_invoice(osv.osv):
             context=context)
         return currency_ids[0]
 
+    def _get_vouchers(self, cr, uid, ids, context=None):
+        _logger.debug("In _get_vouchers")
+        voucher_obj = self.pool.get('account.voucher')
+        move_obj = self.pool.get('account.move.line')
+        lines = self._compute_lines(
+                cr,
+                uid,
+                ids,
+                False,
+                False,
+                context=context)
+        res = {}
+        _logger.debug("Lines: %s", lines)
+        for inv_id in ids:
+            l = lines.get(inv_id, False)
+            if l:
+                res[inv_id] = voucher_obj.search(
+                        cr,
+                        uid,
+                        [('move_id', 'in', [
+                            i.move_id.id
+                            for i in move_obj.browse(
+                                cr,
+                                uid,
+                                l,
+                                context=context)])],
+                        context=context)
+        return res
+
+    def force_cancel(self, cr, uid, ids, context=None):
+        _logger.debug("In force_cancel")
+        if not context:
+            context = {}
+        # make sure we remove all payments
+        voucher_obj = self.pool.get('account.voucher')
+        voucher_list = self._get_vouchers(cr, uid, ids, context=context)
+        voucher_ids = []
+        voucher_to_cancel = []
+        for inv_id in ids:
+            voucher_ids.extend(voucher_list.get(inv_id, []))
+        voucher_to_cancel.extend([
+            v.id
+            for v in voucher_obj.browse(cr, uid, voucher_ids, context=context)
+            if v.state == 'posted'])
+        voucher_obj.cancel_voucher(
+                cr,
+                uid,
+                voucher_to_cancel,
+                context=context)
+        voucher_obj.unlink(cr, uid, voucher_ids, context=context)
+
+        self.action_cancel(cr, uid, ids, context=context)
+
     def correct_invoice_date(self, cr, uid, ids, context=None):
         order_obj = self.pool.get('purchase.order')
 
@@ -67,7 +122,7 @@ class account_invoice(osv.osv):
             if inv.state not in ('draft', 'proforma', 'proforma2'):
                 raise osv.except_osv(
                     _('Warning!'),
-                    _("Selected invoice(s) cannot be confirmed as they are not in 'Draft' or 'Pro-Forma' state."))
+                    _("Selected invoice(s) cannot be confirmed."))
             wf_service.trg_validate(
                     uid,
                     'account.invoice',
