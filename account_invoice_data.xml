@@ -6,7 +6,7 @@
             <field name="type">ir.actions.server</field>
             <field name="model_id" ref="model_account_invoice"/>
             <field name="name">Switch date to Purchase Order</field>
-            <field name="sequence" eval="5"/>
+            <field name="sequence" eval="6"/>
             <field name="condition">True</field>
             <field name="state">code</field>
             <field name="code">self.correct_invoice_date(cr, uid, context.get('active_ids', []),  context=context)</field>
@@ -27,13 +27,13 @@
             <field name="type">ir.actions.server</field>
             <field name="model_id" ref="model_account_invoice"/>
             <field name="name">Pay Cash on Invoice Date</field>
-            <field name="sequence" eval="5"/>
+            <field name="sequence" eval="7"/>
             <field name="condition">True</field>
             <field name="state">code</field>
             <field name="code">self.invoice_validate_and_pay_cash(cr, uid, context.get('active_ids', []),  context=context)</field>
         </record>
 
-        <record model="ir.values" id="action_batch_change_date">
+        <record model="ir.values" id="action_batch_pay_cash_on_date">
             <field name="name">action_batch_pay_cash_on_date</field>
             <field name="action_id" ref="ir_actions_server_pay_cash_on_date" />
             <field name="value" eval="'ir.actions.server,' + str(ref('ir_actions_server_pay_cash_on_date'))" />

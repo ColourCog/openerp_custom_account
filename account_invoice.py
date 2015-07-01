@@ -77,6 +77,9 @@ class account_invoice(osv.osv):
         return self._create_cash_voucher(cr, uid, ids, context=context)
 
     def _create_cash_voucher(self, cr, uid, ids, context):
+        ctx = context.copy()
+        ctx.update({'account_period_prefer_normal': True})
+
         voucher_obj = self.pool.get('account.voucher')
         inv_obj = self.pool.get('account.invoice')
         journal_obj = self.pool.get('account.journal')
@@ -86,9 +89,9 @@ class account_invoice(osv.osv):
             cr,
             uid,
             uid,
-            context=context).company_id.id
+            context=ctx).company_id.id
 
-        for inv in inv_obj.browse(cr, uid, ids, context=context):
+        for inv in inv_obj.browse(cr, uid, ids, context=ctx):
             name = _('Cash Purchase by %s') % (inv.reference)
             partner_id = inv.partner_id.id
             journal = journal_obj.browse(
@@ -97,8 +100,8 @@ class account_invoice(osv.osv):
                 self._get_cash_journal(
                     cr,
                     uid,
-                    context=context),
-                context=context)
+                    context=ctx),
+                context=ctx)
             amt = inv.residual
             credit_account_id = inv.account_id.id
             move_line_id = move_line_obj.search(
@@ -106,7 +109,7 @@ class account_invoice(osv.osv):
                 uid,
                 [('move_id', '=', inv.move_id.id),
                     ('invoice', '=', inv.id)],
-                context=context)[0]
+                context=ctx)[0]
             voucher = {
                 'journal_id': journal.id,
                 'company_id': company_id,
@@ -122,7 +125,7 @@ class account_invoice(osv.osv):
                     cr,
                     uid,
                     inv.date_invoice,
-                    context=context)[0]
+                    context=ctx)[0],
                 }
 
             vl = (0, 0, {
@@ -138,13 +141,13 @@ class account_invoice(osv.osv):
                 cr,
                 uid,
                 voucher,
-                context=context)
+                context=ctx)
             voucher_obj.button_proforma_voucher(
                 cr,
                 uid,
                 [voucher_id],
                 context)
-            inv_obj.confirm_paid(cr, uid, [inv.id], context=context)
+            inv_obj.confirm_paid(cr, uid, [inv.id], context=ctx)
 
         return True
 

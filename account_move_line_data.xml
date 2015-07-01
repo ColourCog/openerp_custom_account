@@ -6,7 +6,7 @@
             <field name="type">ir.actions.server</field>
             <field name="model_id" ref="model_account_move_line"/>
             <field name="name">Switch Period to Effective Date</field>
-            <field name="sequence" eval="5"/>
+            <field name="sequence" eval="8"/>
             <field name="condition">True</field>
             <field name="state">code</field>
             <field name="code">self.correct_move_period(cr, uid, context.get('active_ids', []),  context=context)</field>
