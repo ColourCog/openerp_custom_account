@@ -118,18 +118,18 @@ class account_invoice(osv.osv):
             context = {}
         if not ids:
             return []
+        real_ids = []
         for inv in self.browse(cr, uid, ids, context=context):
-            if inv.state not in ('draft', 'proforma', 'proforma2'):
-                raise osv.except_osv(
-                    _('Warning!'),
-                    _("Selected invoice(s) cannot be confirmed."))
-            wf_service.trg_validate(
-                    uid,
-                    'account.invoice',
-                    inv.id,
-                    'invoice_open',
-                    cr)
-        return self._create_cash_voucher(cr, uid, ids, context=context)
+            if inv.state in ('draft', 'proforma', 'proforma2'):
+                wf_service.trg_validate(
+                        uid,
+                        'account.invoice',
+                        inv.id,
+                        'invoice_open',
+                        cr)
+            if inv.state != 'paid':
+                real_ids.append(inv.id)
+        return self._create_cash_voucher(cr, uid, real_ids, context=context)
 
     def _create_cash_voucher(self, cr, uid, ids, context):
         ctx = context.copy()

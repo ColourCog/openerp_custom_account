@@ -9,7 +9,7 @@
             <field name="sequence" eval="8"/>
             <field name="condition">True</field>
             <field name="state">code</field>
-            <field name="code">self.correct_move_period(cr, uid, context.get('active_ids', []),  context=context)</field>
+            <field name="code">self.correct_move_line_period(cr, uid, context.get('active_ids', []),  context=context)</field>
         </record>
 
         <record model="ir.values" id="action_batch_change_period">

@@ -1,6 +1,6 @@
 {
     "name" : "Custom EIS Modifications",
-    "version" : "4.0",
+    "version" : "4.1",
     "category" : "Accounting",
     "sequence": 60,
     "complexity" : "normal",
@@ -10,6 +10,7 @@
         "base",
         "hr_payroll",
         "hr_payroll_account",
+        "hr_payslip_voucher",
         "hr_loan",
         "account_accountant",
         "account_check_writing",
@@ -61,6 +62,7 @@ Extra features:
         "partner_view.xml",
         "purchase_data.xml",
         "account_invoice_data.xml",
+        "account_move_data.xml",
         "account_move_line_data.xml",
     ],
     "application": False,

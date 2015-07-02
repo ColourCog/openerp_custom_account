@@ -32,6 +32,7 @@ class hr_payslip(osv.osv):
     _inherit = 'hr.payslip'
 
     def cancel_sheet(self, cr, uid, ids, context=None):
+        self.write(cr, uid, ids, {'period_id': False}, context=context)
         wf_service = netsvc.LocalService("workflow")
         for payslip in self.browse(cr, uid, ids, context=context):
             super(hr_payslip, self).cancel_sheet(cr, uid, [payslip.id], context=context)
@@ -70,30 +71,67 @@ class hr_payslip(osv.osv):
         self.compute_sheet(cr, uid, [new_id], context=context)
         return new_id
 
-    def batch_duplicate(self, cr, uid, ids, context=None):
-        #~ for payslip in self.browse(cr, uid, ids, context=context):
-            #~ self.copy(cr, uid, payslip.id, default=None, context=context)
-        #~ return ids
-        dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'custom_account', 'hr_payslip_duplicate_view')
-
-        return {
-            'name':_("Duplicate Payslips"),
-            'view_mode': 'form',
-            'view_id': view_id,
-            'view_type': 'form',
-            'res_model': 'hr.payslip.duplicate',
-            'type': 'ir.actions.act_window',
-            'nodestroy': True,
-            'target': 'new',
-            'domain': '[]',
-            'context': context
-        }
 
 hr_payslip()
 
+
+class hr_payslip_confirm(osv.osv_memory):
+    """
+    This wizard will confirm the all the selected draft payslips
+    """
+
+    _name = "hr.payslip.confirm"
+    _description = "Confirm the selected playslips"
+
+    _columns = {
+        'voucher_date': fields.date('Pay on the'),
+    }
+
+    _defaults = {
+        'voucher_date': time.strftime('%Y-%m-01'),
+    }
+
+    def confirm_slips(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+        pool_obj = pooler.get_pool(cr.dbname)
+        slip_obj = pool_obj.get('hr.payslip')
+        slips = slip_obj.read(
+                cr,
+                uid,
+                context['active_ids'],
+                context=context)
+        context.update({
+            'voucher_date': self.browse(cr, uid, ids)[0].voucher_date,
+            })
+
+        for record in slips:
+            slip_obj.hr_verify_sheet(cr, uid, [record['id']], context=context)
+            slip_obj.process_sheet(cr, uid, [record['id']], context=context)
+        return {'type': 'ir.actions.act_window_close'}
+
+    def confirm_slips_no_date(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+        pool_obj = pooler.get_pool(cr.dbname)
+        slip_obj = pool_obj.get('hr.payslip')
+        slips = slip_obj.read(
+                cr,
+                uid,
+                context['active_ids'],
+                context=context)
+
+        for record in slips:
+            slip_obj.hr_verify_sheet(cr, uid, [record['id']], context=context)
+            slip_obj.process_sheet(cr, uid, [record['id']], context=context)
+        return {'type': 'ir.actions.act_window_close'}
+
+hr_payslip_confirm()
+
+
 class hr_payslip_duplicate(osv.osv_memory):
     """
-    This wizard will confirm the all the selected draft invoices
+    This wizard will duplicate all selected payslips using the give dates
     """
 
     _name = "hr.payslip.duplicate"
@@ -125,6 +163,5 @@ class hr_payslip_duplicate(osv.osv_memory):
         return {'type': 'ir.actions.act_window_close'}
 
 hr_payslip_duplicate()
-
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
