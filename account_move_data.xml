@@ -14,7 +14,7 @@
 
         <record model="ir.values" id="action_batch_change_period_move">
             <field name="name">action_batch_change_period_move</field>
-            <field name="action_id" ref="ir_actions_server_change_period_move" />
+            <field name="action_id" ref="ir_actions_server_change_period_move"/>
             <field name="value" eval="'ir.actions.server,' + str(ref('ir_actions_server_change_period_move'))" />
             <field name="key">action</field>
             <field name="model_id" ref="model_account_move" />
@@ -22,6 +22,26 @@
             <field name="key2">client_action_multi</field>
         </record>
 
+
+    <record id="ir_actions_server_batch_cancel_move" model="ir.actions.server">
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_account_move"/>
+            <field name="name">Cancel selected Journal Entries</field>
+            <field name="sequence" eval="8"/>
+            <field name="condition">True</field>
+            <field name="state">code</field>
+            <field name="code">self.button_cancel(cr, uid, context.get('active_ids', []),  context=context)</field>
+        </record>
+
+        <record model="ir.values" id="action_batch_cancel_move">
+            <field name="name">action_batch_cancel_move</field>
+            <field name="action_id" ref="ir_actions_server_batch_cancel_move"/>
+            <field name="value" eval="'ir.actions.server,' + str(ref('ir_actions_server_batch_cancel_move'))" />
+            <field name="key">action</field>
+            <field name="model_id" ref="model_account_move" />
+            <field name="model">account.move</field>
+            <field name="key2">client_action_multi</field>
+        </record>
 
   </data>
 </openerp>
