@@ -23,5 +23,20 @@
         </record>
 
 
+    <record id="hr_payroll_rules_irpp_level2_modified" model="hr.salary.rule">
+        <field name="category_id" ref="hr_payroll_category_irpp_calc"/>
+        <field name="name">IRPP 50000-130000 (12000)</field>
+        <field name="code">IRPP2X</field>
+        <field name="sequence">161</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = 0.0
+if categories.GROSS &gt; 50000:
+    result = -12000.0
+    if categories.GROSS &lt;= 130000:
+        result = -(categories.GROSS - 50000) * 0.10
+        </field>
+    </record>
+
   </data>
 </openerp>
