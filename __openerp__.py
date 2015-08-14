@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 {
     "name" : "Custom EIS Modifications",
-    "version" : "4.1",
+    "version" : "4.3",
     "category" : "Accounting",
     "sequence": 60,
     "complexity" : "normal",
@@ -12,9 +13,11 @@
         "hr_payroll_account",
         "hr_payslip_voucher",
         "hr_loan",
+        "l10n_bj_payroll",
         "account_accountant",
         "account_check_writing",
         "point_of_sale",
+        "purchase",
     ],
     "summary" : "Modifies standard OpenERP functionality",
     "description" : """
@@ -48,6 +51,8 @@ Extra features:
 * batch switch invoice date to purchase order date
 * batch validate/pay invoices using the cash method
 * batch switch move line period to effective date period
+* batch cancel journal entries
+* batch shift invoice expense account
     """,
     "data" : [
         "security/ir_rule.xml",

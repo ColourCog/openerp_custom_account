@@ -99,5 +99,33 @@
                 </field>
             </field>
         </record>
+
+
+    <record id="invoice_shift_account" model="ir.ui.view">
+        <field name="name">account.invoice.shift.form</field>
+        <field name="model">account.invoice.shift</field>
+        <field name="arch" type="xml">
+            <form string="Shift Account" version="7.0">
+                <group>
+                  <field name="source_account_id" />
+                  <field name="target_account_id" />
+                </group>
+                <footer>
+                    <button string="Shift" name="shift_accounts" type="object" />
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="action_invoice_shift_account"
+        name="Shift Expense account"
+        res_model="account.invoice.shift" 
+        src_model="account.invoice"
+        key2="client_action_multi"
+        view_mode="form" target="new" view_type="form" />
+
+
   </data>
 </openerp>

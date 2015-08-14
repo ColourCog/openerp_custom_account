@@ -4,6 +4,7 @@ import logging
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp import netsvc
+from openerp import pooler
 _logger = logging.getLogger(__name__)
 
 
@@ -218,5 +219,52 @@ class account_invoice(osv.osv):
     }
 
 account_invoice()
+
+class account_invoice_shift_account(osv.osv_memory):
+    """
+    This wizard will confirm the all the selected draft payslips
+    """
+
+    _name = "account.invoice.shift"
+    _description = "Shift Expense account"
+
+    _columns = {
+        'source_account_id': fields.many2one('account.account', 'Move from', required=True, domain=[('type','<>','view'), ('type', '<>', 'closed')]),
+        'target_account_id': fields.many2one('account.account', 'Move to', required=True, domain=[('type','<>','view'), ('type', '<>', 'closed')]),
+    }
+
+
+    def shift_accounts(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+        pool_obj = pooler.get_pool(cr.dbname)
+        inv_obj = pool_obj.get('account.invoice')
+        inv_line_obj = pool_obj.get('account.invoice.line')
+        move_line_obj = pool_obj.get('account.move.line')
+        src = self.browse(cr, uid, ids)[0].source_account_id.id
+        tgt = self.browse(cr, uid, ids)[0].target_account_id.id
+        invoices = inv_obj.browse(
+                cr,
+                uid,
+                context['active_ids'],
+                context=context)
+        inv_lines_to_shift = []
+        move_lines_to_shift = []
+        for inv in invoices:
+            #1. iterate through invoice lines
+            
+            for line in inv.invoice_line:
+                if line.account_id.id == src:
+                    inv_lines_to_shift.append(line.id)
+            if inv.move_id:
+                for line in inv.move_id.line_id:
+                    if line.account_id.id == src:
+                        move_lines_to_shift.append(line.id)
+        inv_line_obj.write(cr, uid, inv_lines_to_shift, {'account_id': tgt}, context=context)
+        move_line_obj.write(cr, uid, move_lines_to_shift, {'account_id': tgt}, context=context, update_check=False)
+        return {'type': 'ir.actions.act_window_close'}
+
+
+account_invoice_shift_account()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
