@@ -124,8 +124,8 @@
         res_model="account.invoice.shift" 
         src_model="account.invoice"
         key2="client_action_multi"
-        view_mode="form" target="new" view_type="form" />
-
+        multi="True"
+        view_mode="tree,form" target="new" view_type="form" />
 
   </data>
 </openerp>
