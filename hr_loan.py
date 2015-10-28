@@ -27,7 +27,7 @@ class hr_loan(osv.osv):
             'account.account',
             'Transit Account',
             readonly=True,
-            states={'accepted': [('readonly', False)], 'waiting': [('readonly', False)]},
+            states={'accepted': [('readonly', False)], 'waiting': [('readonly', False)]}),
     }
 
 
