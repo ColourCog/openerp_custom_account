@@ -21,6 +21,14 @@ class hr_loan(osv.osv):
     '''Quick loan fixes'''
 
     _inherit = 'hr.loan'
+    
+    _columns = {    
+        'account_credit': fields.many2one(
+            'account.account',
+            'Transit Account',
+            readonly=True,
+            states={'accepted': [('readonly', False)], 'waiting': [('readonly', False)]},
+    }
 
 
     def batch_reprocess_loan(self, cr, uid, ids, context=None):
