@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name" : "Custom EIS Modifications",
-    "version" : "4.3",
+    "version" : "4.4",
     "category" : "Accounting",
     "sequence": 60,
     "complexity" : "normal",
@@ -53,6 +53,7 @@ Extra features:
 * batch switch move line period to effective date period
 * batch cancel journal entries
 * batch shift invoice expense account
+* import invoice to setup loan
     """,
     "data" : [
         "security/ir_rule.xml",
@@ -60,6 +61,7 @@ Extra features:
         "account_invoice_view.xml",
         "hr_payroll_view.xml",
         "hr_payroll_data.xml",
+        "hr_loan_view.xml",
         "hr_loan_data.xml",
         "accounting_data.xml",
         "account_voucher_view.xml",

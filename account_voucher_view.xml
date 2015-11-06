@@ -36,7 +36,7 @@
         </record>
 
         <!-- Pay cash button-->
-        <record id="view_invoice_supplier_pay cash" model="ir.ui.view">
+        <record id="view_invoice_supplier_pay_cash" model="ir.ui.view">
             <field name="name">account.invoice.supplier.pay.cash</field>
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account_voucher.view_invoice_supplier"/>
