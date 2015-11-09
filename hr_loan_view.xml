@@ -31,7 +31,7 @@
                 <group>
                   <field name="partner_id" />
                   <field name="invoice_id" 
-                    domain="[('partner_id', '=', partner_id)]" 
+                    domain="[('partner_id', '=', partner_id), ('state', '=', 'open')]" 
                     on_change="onchange_invoice(invoice_id)" />
                   <field name="amount" />
                   <field name="nb_payments" on_change="onchange_nb_payments(amount, nb_payments)" />
