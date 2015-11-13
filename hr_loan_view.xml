@@ -23,28 +23,35 @@
 
     <!-- Wizard -->
     <record id="hr_loan_invoice_view" model="ir.ui.view">
-        <field name="name">hr.loan.invoice.form</field>
-        <field name="model">hr.loan.invoice</field>
-        <field name="arch" type="xml">
-            <form string="Import Invoice" version="7.0">
-                <p>Use invoice as basis for a loan</p>
-                <group>
-                  <field name="partner_id" />
-                  <field name="invoice_id" 
-                    domain="[('partner_id', '=', partner_id), ('state', '=', 'open')]" 
-                    on_change="onchange_invoice(invoice_id)" />
-                  <field name="amount" />
-                  <field name="nb_payments" on_change="onchange_nb_payments(amount, nb_payments)" />
-                  <field name="installment"/>
-                  <field name="paymethod_id" domain="[('type', 'in', ['cash','bank'])]"/>
-                </group>
-                <footer>
-                    <button string="Import" name="import_loan" type="object" default_focus="1" class="oe_highlight"/>
-                    or
-                    <button string="Cancel" class="oe_link" special="cancel"/>
-                </footer>
-            </form>
-        </field>
+      <field name="name">hr.loan.invoice.form</field>
+      <field name="model">hr.loan.invoice</field>
+      <field name="arch" type="xml">
+        <form string="Import Invoice" version="7.0">
+          <p>Use invoice as basis for a loan</p>
+          <group>
+            <group>
+              <field name="employee_partner_id" 
+                invisible="1"
+                on_change="onchange_employee(employee_partner_id)"/>
+              <field name="partner_id" />
+              <field name="invoice_id" 
+                domain="[('partner_id', '=', partner_id), ('state', '=', 'open')]" 
+                on_change="onchange_invoice(invoice_id)" />
+              <field name="paymethod_id" domain="[('type', 'in', ['cash','bank'])]"/>
+            </group>
+            <group>
+              <field name="amount" on_change="onchange_amount(amount, nb_payments)" />
+              <field name="nb_payments" on_change="onchange_nb_payments(amount, nb_payments)" />
+              <field name="installment"/>
+            </group>
+          </group>
+          <footer>
+              <button string="Import" name="import_loan" type="object" default_focus="1" class="oe_highlight"/>
+              or
+              <button string="Cancel" class="oe_link" special="cancel"/>
+          </footer>
+        </form>
+      </field>
     </record>
 
 

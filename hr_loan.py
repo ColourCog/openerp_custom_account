@@ -28,6 +28,10 @@ class hr_loan(osv.osv):
             'account.invoice',
             'Origin Invoice',
             readonly=True),
+        'hidden_move_id': fields.many2one(
+            'account.move', 
+            'Ownership Entry',
+            readonly=True),
         'notes': fields.text(
             'Justification',
             readonly=True,
@@ -82,7 +86,8 @@ class hr_loan(osv.osv):
                 'date_valid': context.get('date'),
                 'user_valid': uid,
             }
-            # make the payment
+            
+            # make the payment            
             vals['voucher_id'] = self._create_voucher(
                 cr, 
                 uid, 
@@ -96,6 +101,59 @@ class hr_loan(osv.osv):
                 context.get('amount'), 
                 context=context)
 
+            # if need be, make the ownership switch
+            if context.get('employee_partner_id') != context.get('partner_id'):
+                ctx = dict(context or {}, account_period_prefer_normal=True)
+                move_obj = self.pool.get('account.move')
+                period_obj = self.pool.get('account.period')
+                journal_obj = self.pool.get('account.journal')
+                company_id = loan.company_id.id
+                period_id = period_obj.find(cr, uid, context.get('date'), context=ctx)[0]
+                journal = journal_obj.browse(cr, uid, context.get('paymethod_id'), context=ctx)
+                account_id = journal.default_debit_account_id.id
+                
+                vals['hidden_move_id'] =  move_obj.create(
+                    cr, 
+                    uid, 
+                    move_obj.account_move_prepare(
+                        cr, 
+                        uid, 
+                        loan.journal_id.id, 
+                        date=context.get('date'), 
+                        ref=_('LOAN %s ownership switch') % (loan.name), 
+                        company_id=company_id, 
+                        context=ctx),
+                    context=ctx)
+                    
+
+                lml = []
+                # create the debit move line
+                lml.append({
+                        'partner_id': context.get('partner_id'),
+                        'name': loan.name,
+                        'debit': context.get('amount'),
+                        'account_id': account_id,
+                        'date_maturity': context.get('date'),
+                        'period_id': period_id,
+                        })
+
+                # create the credit move line
+                lml.append({
+                        'partner_id': context.get('employee_partner_id'),
+                        'name': loan.name,
+                        'credit': context.get('amount'),
+                        'account_id': account_id,
+                        'date_maturity': context.get('date'),
+                        'period_id': period_id,
+                        })
+                # convert eml into an osv-valid format
+                lines = [(0, 0, x) for x in lml]
+                move_obj.write(cr, uid, [vals['hidden_move_id']], {'line_id': lines}, context=ctx)
+                # post the journal entry if 'Skip 'Draft' State for Manual Entries' is checked
+                if loan.journal_id.entry_posted:
+                    move_obj.button_validate(cr, uid, [vals['hidden_move_id']], ctx)
+            
+            #ok we're done now
             self.write(
                 cr, 
                 uid, 
@@ -123,6 +181,12 @@ class hr_loan(osv.osv):
                     [loan.id], 
                     {'invoice_id': False, 'move_id': False}, 
                     context=context)
+                if loan.hidden_move_id:
+                    move_obj.unlink(
+                        cr,
+                        uid,
+                        [loan.hidden_move_id.id],
+                        context=context)
             if loan.move_id and not loan.invoice_id:
                 move_obj.unlink(
                     cr,
@@ -167,7 +231,6 @@ class hr_loan(osv.osv):
                     {'voucher_id': False},
                     context=context)
         
-
 hr_loan()
 
 
@@ -188,6 +251,9 @@ class hr_loan_invoice(osv.osv_memory):
             return emp.address_home_id.id
         return False
 
+    def onchange_employee(self, cr, uid, ids, employee_partner_id, context=None):
+        return {'value': {'partner_id': employee_partner_id}}
+
     def onchange_invoice(self, cr, uid, ids, invoice_id, context=None):
         inv = self.pool.get('account.invoice').browse(
             cr, 
@@ -196,25 +262,36 @@ class hr_loan_invoice(osv.osv_memory):
             context=context)
         return {'value': {'amount': inv.amount_total}}
 
-    def onchange_nb_payments(self, cr, uid, ids, amount, nb_payments,
-                                context=None):
+    def onchange_amount(self, cr, uid, ids, amount, nb_payments,
+                        context=None):
         val = amount / nb_payments
         return {'value': {'installment': val}}
 
+    def onchange_nb_payments(self, cr, uid, ids, amount, nb_payments,
+                                context=None):
+        return self.onchange_amount(
+                cr,
+                uid,
+                ids,
+                amount,
+                nb_payments,
+                context=context)
+
 
     _columns = {
+        'employee_partner_id': fields.many2one(
+            'res.partner',
+            'Employee Partner'),
         'partner_id': fields.many2one(
             'res.partner',
-            'Partner',
-            readonly=True),
+            'Partner'),
         'invoice_id': fields.many2one(
             'account.invoice', 
             'Invoice to transfer', 
             required=True),
-        'amount': fields.related(
-            'invoice_id',
-            'amount_total',
-            string="Amount"),
+        'amount': fields.integer(
+            'Amount',
+            required=True),
         'nb_payments': fields.integer(
             'Number of payments',
             required=True),
@@ -228,7 +305,8 @@ class hr_loan_invoice(osv.osv_memory):
             required=True),
     }
     _defaults = {
-        'partner_id': _get_partner,
+        'employee_partner_id': _get_partner,
+        'nb_payments': 1,
     }
 
     def import_loan(self, cr, uid, ids, context=None):
@@ -238,10 +316,12 @@ class hr_loan_invoice(osv.osv_memory):
         loan_obj = pool_obj.get('hr.loan')
 
         context.update({
+            'employee_partner_id': self.browse(cr, uid, ids)[0].employee_partner_id.id,
+            'partner_id': self.browse(cr, uid, ids)[0].partner_id.id,
             'invoice_id': self.browse(cr, uid, ids)[0].invoice_id.id,
             'move_id': self.browse(cr, uid, ids)[0].invoice_id.move_id.id,
             'date': self.browse(cr, uid, ids)[0].invoice_id.date_invoice,
-            'amount': self.browse(cr, uid, ids)[0].invoice_id.amount_total,
+            'amount': self.browse(cr, uid, ids)[0].amount,
             'nb_payments': self.browse(cr, uid, ids)[0].nb_payments,
             'installment': self.browse(cr, uid, ids)[0].installment,
             'paymethod_id': self.browse(cr, uid, ids)[0].paymethod_id.id,

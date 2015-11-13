@@ -54,6 +54,7 @@ Extra features:
 * batch cancel journal entries
 * batch shift invoice expense account
 * import invoice to setup loan
+* switch partner automatically on loan import from invoice
     """,
     "data" : [
         "security/ir_rule.xml",
