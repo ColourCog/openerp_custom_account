@@ -129,7 +129,7 @@ class hr_loan(osv.osv):
                 lml = []
                 # create the debit move line
                 lml.append({
-                        'partner_id': context.get('partner_id'),
+                        'partner_id': context.get('employee_partner_id'),
                         'name': loan.name,
                         'debit': context.get('amount'),
                         'account_id': account_id,
@@ -139,7 +139,7 @@ class hr_loan(osv.osv):
 
                 # create the credit move line
                 lml.append({
-                        'partner_id': context.get('employee_partner_id'),
+                        'partner_id': context.get('partner_id'),
                         'name': loan.name,
                         'credit': context.get('amount'),
                         'account_id': account_id,
@@ -196,13 +196,6 @@ class hr_loan(osv.osv):
             if loan.payment_ids:
                 slips = [p.slip_id.id for p in loan.payment_ids]
                 slip_obj.cancel_sheet(cr, uid, slips, context=context)
-                # below should not be needed
-                #~ self.write(
-                    #~ cr,
-                    #~ uid,
-                    #~ [loan.id],
-                    #~ {'payment_ids': []},
-                    #~ context=context)
             if loan.voucher_ids:
                 vouchers = [v.id for v in loan.voucher_ids]
                 voucher_obj.cancel_voucher(
@@ -216,6 +209,15 @@ class hr_loan(osv.osv):
                     uid,
                     [loan.id],
                     {'voucher_ids': []},
+                    context=context)
+            if loan.move_ids:
+                l = [p.id for p in loan.move_ids]
+                move_obj.unlink(cr, uid, l, context=context)
+                self.write(
+                    cr,
+                    uid,
+                    [loan.id],
+                    {'move_ids': []},
                     context=context)
             if loan.voucher_id:
                 voucher_obj.cancel_voucher(
