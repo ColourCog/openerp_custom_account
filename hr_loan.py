@@ -166,9 +166,60 @@ class hr_loan(osv.osv):
             wf_service.trg_validate(uid, 'hr.loan', loan.id, 'validate', cr)
             wf_service.trg_validate(uid, 'hr.loan', loan.id, 'waiting', cr)
 
+    def loan_voucher(self, cr, uid, ids, context=None):
+        for rec in self.browse(cr, uid, ids, context=context):
+            if rec.voucher_id:
+                raise osv.except_osv(
+                    _('Error'),
+                    _('This loan already has a Give-Out Voucher'))
+
+        dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'custom_account', 'hr_loan_voucher_view')
+
+        return {
+            'name': _("Import Voucher"),
+            'view_mode': 'form',
+            'view_id': view_id,
+            'view_type': 'form',
+            'res_model': 'hr.loan.voucher',
+            'type': 'ir.actions.act_window',
+            'nodestroy': True,
+            'target': 'new',
+            'domain': '[]',
+            'context': context
+        }
+
+    def import_voucher(self, cr, uid, ids, context=None):
+        """Import a voucher as loan give-out"""
+        wf_service = netsvc.LocalService("workflow")
+        for loan in self.browse(cr, uid, ids, context=context):
+            # we expect to get an invoice, a date and a payment method
+            # first set the data
+            vals = {
+                'voucher_id': context.get('voucher_id'),
+                'amount': context.get('amount'),
+                'partner_id': context.get('partner_id'),
+            }
+            if loan.employee_id.address_home_id.id != vals['partner_id']:
+                raise osv.except_osv(
+                    _('Wrong Employee'),
+                    _("Selected voucher's partner does not match employee '%s'!" % loan.employee_id.name))
+            if loan.amount != vals['amount']:
+                raise osv.except_osv(
+                    _('Wrong amount'),
+                    _("Selected voucher's amount does not match loan!" ))
+                        
+            #ok we're ready
+            self.write(
+                cr, 
+                uid, 
+                [loan.id], 
+                vals,
+                context=context)
+                
+
     def clean_loan(self, cr, uid, ids, context=None):
         """We are going to bypass all security and 
-        recusrively cancel where needed"""
+        recursively cancel where needed"""
         pay_obj = self.pool.get('hr.loan.payment')
         move_obj = self.pool.get('account.move')
         voucher_obj = self.pool.get('account.voucher')
@@ -311,7 +362,7 @@ class hr_loan_invoice(osv.osv_memory):
         'nb_payments': 1,
     }
 
-    def import_loan(self, cr, uid, ids, context=None):
+    def import_invoice(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
         pool_obj = pooler.get_pool(cr.dbname)
@@ -335,9 +386,71 @@ class hr_loan_invoice(osv.osv_memory):
 
 hr_loan_invoice()
 
-#~ TODO:
-    #~ 1. create a tool that will import an existing invoice in a new loan.
-    #~ the invoice's move become the loan's move and the invoice's payment becomes
-    #~ the loan's giveout.
-         
+class hr_loan_voucher(osv.osv_memory):
+    """
+    This wizard import an voucher into a loan
+    """
+
+    _name = "hr.loan.voucher"
+    _description = "Import Voucher as Loan Give-Out"
+
+    def _get_partner(self, cr, uid, ctx=None):
+        emp = self.pool.get('hr.employee').browse(
+            cr, 
+            uid, 
+            ctx.get('employee_id', False), context=ctx)
+        if emp.address_home_id:
+            return emp.address_home_id.id
+        return False
+
+    def onchange_employee(self, cr, uid, ids, employee_partner_id, context=None):
+        return {'value': {'partner_id': employee_partner_id}}
+
+    def onchange_voucher(self, cr, uid, ids, voucher_id, context=None):
+        voucher = self.pool.get('account.voucher').browse(
+            cr, 
+            uid, 
+            voucher_id, 
+            context=context)
+        return {'value': {'amount': voucher.amount}}
+
+
+    _columns = {
+        'employee_partner_id': fields.many2one(
+            'res.partner',
+            'Employee Partner'),
+        'partner_id': fields.many2one(
+            'res.partner',
+            'Partner'),
+        'voucher_id': fields.many2one(
+            'account.voucher', 
+            'Voucher to use', 
+            required=True),
+        'amount': fields.integer(
+            'Amount',
+            required=True),
+    }
+    _defaults = {
+        'employee_partner_id': _get_partner,
+    }
+
+    def import_voucher(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+        pool_obj = pooler.get_pool(cr.dbname)
+        loan_obj = pool_obj.get('hr.loan')
+
+        context.update({
+            'employee_partner_id': self.browse(cr, uid, ids)[0].employee_partner_id.id,
+            'partner_id': self.browse(cr, uid, ids)[0].partner_id.id,
+            'voucher_id': self.browse(cr, uid, ids)[0].voucher_id.id,
+            'amount': self.browse(cr, uid, ids)[0].amount,
+            })
+
+        loan_obj.import_voucher(cr, uid, [context.get('active_id')], context=context)
+
+        return {'type': 'ir.actions.act_window_close'}
+
+hr_loan_voucher()
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

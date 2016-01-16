@@ -28,6 +28,8 @@ from openerp import netsvc
 from openerp import pooler
 from openerp.osv import fields, osv, orm
 from openerp.tools.translate import _
+import logging
+_logger = logging.getLogger(__name__)
 
 ## Overloading amount_to_text here because CFA has no cents,
 
@@ -57,8 +59,8 @@ def _convert_nn_fr(val):
 
 def _convert_nnn_fr(val):
     """ convert a value < 1000 to french
-    
-        special cased because it is the level that kicks 
+
+        special cased because it is the level that kicks
         off the < 100 special case.  The rest are more general.  This also allows you to
         get strings in the form of 'forty-five hundred' if called directly.
     """
@@ -113,7 +115,7 @@ denom = ( '',
           'Quintillion',  'Sextillion',      'Septillion',    'Octillion',      'Nonillion',
           'Decillion',    'Undecillion',     'Duodecillion',  'Tredecillion',   'Quattuordecillion',
           'Sexdecillion', 'Septendecillion', 'Octodecillion', 'Novemdecillion', 'Vigintillion' )
-    
+
 def _convert_nn(val):
     """convert a value < 100 to English.
     """
@@ -127,7 +129,7 @@ def _convert_nn(val):
 
 def _convert_nnn(val):
     """
-        convert a value < 1000 to english, special cased because it is the level that kicks 
+        convert a value < 1000 to english, special cased because it is the level that kicks
         off the < 100 special case.  The rest are more general.  This also allows you to
         get strings in the form of 'forty-five hundred' if called directly.
     """
@@ -181,13 +183,13 @@ class account_voucher(osv.osv):
             partner = self.pool['res.partner'].browse(cr, uid, partner_id, context=context)
             if partner.lang:
                 lang = partner.lang
-        
+
         lang_map = {
             'en_GB': amount_to_text_en,
             'en_US': amount_to_text_en,
             'fr_FR': amount_to_text_fr,
             }
-        
+
         if currency.name.upper() == 'EUR':
             currency_name = 'Euro'
         elif currency.name.upper() == 'USD':
@@ -220,20 +222,20 @@ class account_voucher(osv.osv):
         if vals.get('amount') and vals.get('journal_id') and 'amount_in_word' not in vals:
             vals['amount_in_word'] = self._amount_to_text_custom(cr, uid, vals['amount'], vals.get('currency_id') or \
                 self.pool['account.journal'].browse(cr, uid, vals['journal_id'], context=context).currency.id or \
-                self.pool['res.company'].browse(cr, uid, vals['company_id']).currency_id.id, 
+                self.pool['res.company'].browse(cr, uid, vals['company_id']).currency_id.id,
                 vals.get('partner_id'), context=context)
         return super(account_voucher, self).create(cr, uid, vals, context=context)
 
     def write(self, cr, uid, ids, vals, context=None):
         for voucher in self.browse(cr, uid, ids, context=context):
-            vals["amount_in_word"] = self._amount_to_text_custom(cr, uid, voucher.amount, 
+            vals["amount_in_word"] = self._amount_to_text_custom(cr, uid, voucher.amount,
                 voucher.company_id.currency_id.id, voucher.partner_id.id, context=context)
             voucher_id = super(account_voucher, self).write(cr, uid, [voucher.id], vals, context=context)
         return ids
 
     def voucher_print(self, cr, uid, ids, context=None):
         return {
-            'type': 'ir.actions.report.xml', 
+            'type': 'ir.actions.report.xml',
             'report_name': 'custom.account.voucher',
             'datas': {
                     'model':'account.voucher',
@@ -243,6 +245,23 @@ class account_voucher(osv.osv):
                 },
             'nodestroy': True
             }
+
+    def action_move_line_create(self, cr, uid, ids, context=None):
+        super(account_voucher, self).action_move_line_create(cr, uid, ids, context=context)
+        # find a potential invoice down the line
+        inv_obj = self.pool.get('account.invoice')
+        for voucher in self.browse(cr, uid, ids, context=context):
+            inv_ids = []
+            for line in voucher.move_id.line_id:
+                if line.reconcile_id:
+                    l = [o.move_id.id for o in line.reconcile_id.line_id ]
+                    cr.execute("SELECT id FROM account_invoice WHERE move_id IN %s", (tuple(l),))
+                    inv_ids.extend([i[0] for i in cr.fetchall()])
+            for inv_id in inv_ids:
+                if inv_obj.test_paid(cr, uid, [inv_id], context):
+                    inv_obj.confirm_paid(cr, uid, [inv_id], context)
+
+
 account_voucher()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

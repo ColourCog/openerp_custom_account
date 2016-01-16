@@ -12,6 +12,7 @@ class account_invoice(osv.osv):
     _inherit = 'account.invoice'
     _name = 'account.invoice'
 
+
     def invoice_print(self, cr, uid, ids, context=None):
         """This function overloads the default invoice print """
         res = super(account_invoice, self).invoice_print(
@@ -222,7 +223,7 @@ account_invoice()
 
 class account_invoice_shift_account(osv.osv_memory):
     """
-    This wizard will confirm the all the selected draft payslips
+    This wizard will move all selected invoices to the chosen account
     """
 
     _name = "account.invoice.shift"
@@ -252,7 +253,7 @@ class account_invoice_shift_account(osv.osv_memory):
         move_lines_to_shift = []
         for inv in invoices:
             #1. iterate through invoice lines
-            
+
             for line in inv.invoice_line:
                 if line.account_id.id == src:
                     inv_lines_to_shift.append(line.id)

@@ -55,6 +55,8 @@ Extra features:
 * batch shift invoice expense account
 * import invoice to setup loan
 * switch partner automatically on loan import from invoice
+* force invoices to update their status when paid
+* import voucher as loan give-out
     """,
     "data" : [
         "security/ir_rule.xml",
