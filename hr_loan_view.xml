@@ -23,7 +23,7 @@
                   name="loan_voucher" 
                   type="object" 
                   string="Import Voucher" 
-                  states="accepted,waiting" 
+                  states="accepted,waiting,paid" 
                   context="{'employee_id':employee_id}"
                   groups="account.group_account_invoice"/>
             </xpath>
