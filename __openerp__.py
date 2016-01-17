@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name" : "Custom EIS Modifications",
-    "version" : "4.8",
+    "version" : "4.9",
     "category" : "Accounting",
     "sequence": 60,
     "complexity" : "normal",
