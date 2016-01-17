@@ -30,7 +30,7 @@
             <xpath expr="//button[@string='Cancel']" position="replace">
               <button 
                 name="cancel" 
-                states="accepted,waiting,suspended,paid" 
+                states="waiting,suspended,paid" 
                 string="Cancel" 
                 confirm="This will probably create many problems down the line. Be warned!"
                 groups="base.group_hr_manager" />
