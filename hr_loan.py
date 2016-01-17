@@ -196,18 +196,73 @@ class hr_loan(osv.osv):
             # first set the data
             vals = {
                 'voucher_id': context.get('voucher_id'),
-                'amount': context.get('amount'),
-                'partner_id': context.get('partner_id'),
             }
-            if loan.employee_id.address_home_id.id != vals['partner_id']:
+            if loan.employee_id.address_home_id.id != context.get('partner_id'):
                 raise osv.except_osv(
                     _('Wrong Employee'),
                     _("Selected voucher's partner does not match employee '%s'!" % loan.employee_id.name))
-            if loan.amount != vals['amount']:
+            if loan.amount != context.get('amount'):
                 raise osv.except_osv(
                     _('Wrong amount'),
                     _("Selected voucher's amount does not match loan!" ))
-                        
+                                    
+            #create a new move_id. This is safe as if skips if exists
+            self.action_receipt_create(cr, uid, [loan.id], context=context)
+            
+            #TODO: we need to discard any existing line_ids and recreate them
+            # using this loan. so if the loan doesn't yet have a move_id, 
+            # we need to create it.
+            move_obj = self.pool.get('account.move')
+            move_line_obj = self.pool.get('account.move.line')
+            voucher_obj = self.pool.get('account.voucher')
+            voucher_line_obj = self.pool.get('account.voucher.line')
+            move = loan.move_id
+            if move:
+                # Define the voucher line
+                lml = []
+                #order the lines by most old first
+                mlids = [l.id for l in move.line_id]
+                mlids.reverse()
+                # Create voucher_lines
+                account_move_lines = move_line_obj.browse(cr, uid, mlids, context=context)
+                account_id = None
+                rec_ids = []
+                for line_id in account_move_lines:
+                    if line_id.debit:
+                        continue
+                    account_id = line_id.account_id.id
+                    if not line_id.reconcile_id:
+                        rec_ids.append(line_id.id)
+                    lml.append({
+                        'name': line_id.name,
+                        'move_line_id': line_id.id,
+                        'reconcile': (line_id.credit <= loan.amount),
+                        'amount': line_id.credit < loan.amount and line_id.credit or max(0, loan.amount),
+                        'account_id': account_id,
+                        'type': 'dr',
+                        })
+                lines = [(0, 0, x) for x in lml]
+                # alright we have the lines. Now we replace in the voucher
+                voucher = voucher_obj.browse(cr, uid, context.get('voucher_id'), context)
+                voucher_line_obj.unlink(cr, uid, [n.id for n in voucher.line_ids], context)
+                voucher_obj.write(cr, uid, [voucher.id], {'line_ids': lines}, context)
+                # now we need to recreate the reconcile if need be (voucher is not draft)
+                if rec_ids and voucher.move_id:
+                    for line in voucher.move_id.line_id:
+                        if line.account_id.id == account_id:
+                            if line.reconcile_id:
+                                raise osv.except_osv(
+                                    _('Reconciliation Error'),
+                                    _("Selected Voucher already reconciles another Journal Item" ))                            
+                            rec_ids.append(line.id)
+                    # go ahead and reconcile
+                    if len(rec_ids) >= 2:
+                        reconcile = move_line_obj.reconcile_partial(cr, uid, rec_ids, writeoff_acc_id=voucher.writeoff_acc_id.id, writeoff_period_id=voucher.period_id.id, writeoff_journal_id=voucher.journal_id.id)
+                    else:
+                        raise osv.except_osv(
+                            _('Reconciliation Error'),
+                            _("Selected Voucher does not match Loan's account" ))                            
+            
             #ok we're ready
             self.write(
                 cr, 
@@ -215,6 +270,9 @@ class hr_loan(osv.osv):
                 [loan.id], 
                 vals,
                 context=context)
+
+            wf_service.trg_validate(uid, 'hr.loan', loan.id, 'validate', cr)
+            wf_service.trg_validate(uid, 'hr.loan', loan.id, 'waiting', cr)
                 
 
     def clean_loan(self, cr, uid, ids, context=None):
@@ -225,6 +283,19 @@ class hr_loan(osv.osv):
         voucher_obj = self.pool.get('account.voucher')
         slip_obj = self.pool.get('hr.payslip')
         for loan in self.browse(cr, uid, ids, context=context):
+            if loan.voucher_id:
+                voucher_obj.cancel_voucher(
+                    cr,
+                    uid,
+                    [loan.voucher_id.id],
+                    context=context)
+                # I'd rather cancel and ignore then delete and regret
+                self.write(
+                    cr,
+                    uid,
+                    [loan.id],
+                    {'voucher_id': False},
+                    context=context)
             if loan.invoice_id and loan.move_id:
                 self.write(
                     cr, 
@@ -269,19 +340,6 @@ class hr_loan(osv.osv):
                     uid,
                     [loan.id],
                     {'move_ids': []},
-                    context=context)
-            if loan.voucher_id:
-                voucher_obj.cancel_voucher(
-                    cr,
-                    uid,
-                    [loan.voucher_id.id],
-                    context=context)
-                # I'd rather cancel and ignore then delete and regret
-                self.write(
-                    cr,
-                    uid,
-                    [loan.id],
-                    {'voucher_id': False},
                     context=context)
         
 hr_loan()

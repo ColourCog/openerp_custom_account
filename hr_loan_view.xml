@@ -9,23 +9,31 @@
         <field name="inherit_id" ref="hr_loan.view_hr_loan_form"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='validate']" position="after">
-                <button 
-                    name="loan_invoice" 
-                    type="object" 
-                    string="Import Invoice" 
-                    states="draft" 
-                    class="oe_highlight" 
-                    context="{'employee_id':employee_id}"
-                    groups="account.group_account_invoice"/>
+              <button 
+                  name="loan_invoice" 
+                  type="object" 
+                  string="Import Invoice" 
+                  states="draft" 
+                  class="oe_highlight" 
+                  context="{'employee_id':employee_id}"
+                  groups="account.group_account_invoice"/>
             </xpath>
             <xpath expr="//button[@name='loan_give']" position="after">
-                <button 
-                    name="loan_voucher" 
-                    type="object" 
-                    string="Import Voucher" 
-                    states="accepted,waiting" 
-                    context="{'employee_id':employee_id}"
-                    groups="account.group_account_invoice"/>
+              <button 
+                  name="loan_voucher" 
+                  type="object" 
+                  string="Import Voucher" 
+                  states="accepted,waiting" 
+                  context="{'employee_id':employee_id}"
+                  groups="account.group_account_invoice"/>
+            </xpath>
+            <xpath expr="//button[@string='Cancel']" position="replace">
+              <button 
+                name="cancel" 
+                states="accepted,waiting,suspended,paid" 
+                string="Cancel" 
+                confirm="This will probably create many problems down the line. Be warned!"
+                groups="base.group_hr_manager" />
             </xpath>
         </field>
     </record>
@@ -77,7 +85,7 @@
             <field name="voucher_id" 
               domain="[('partner_id', '=', partner_id), ('type', '=', 'payment')]" 
               on_change="onchange_voucher(voucher_id)" />
-            <field name="amount" invisible="1"/>
+            <field name="amount"/>
           </group>
           <footer>
               <button string="Import" name="import_voucher" type="object" default_focus="1" class="oe_highlight"/>
