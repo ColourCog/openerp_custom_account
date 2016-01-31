@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name" : "Custom EIS Modifications",
-    "version" : "5.0",
+    "version" : "5.1",
     "category" : "Accounting",
     "sequence": 60,
     "complexity" : "normal",
@@ -18,6 +18,7 @@
         "account_check_writing",
         "point_of_sale",
         "purchase",
+        #~ "school",
     ],
     "summary" : "Modifies standard OpenERP functionality",
     "description" : """
@@ -57,6 +58,7 @@ Extra features:
 * switch partner automatically on loan import from invoice
 * force invoices to update their status when paid
 * import voucher as loan give-out
+* default school data
     """,
     "data" : [
         "security/ir_rule.xml",
@@ -74,6 +76,7 @@ Extra features:
         "account_invoice_data.xml",
         "account_move_data.xml",
         "account_move_line_data.xml",
+        #~ "school_data.xml",
     ],
     "application": False,
     "installable": True

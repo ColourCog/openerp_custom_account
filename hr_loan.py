@@ -85,6 +85,7 @@ class hr_loan(osv.osv):
                 'date_confirm': context.get('date'),
                 'date_valid': context.get('date'),
                 'user_valid': uid,
+                'is_advance': False, #no way this is an advance!
             }
 
             # make the payment
@@ -192,8 +193,6 @@ class hr_loan(osv.osv):
         """Import a voucher as loan give-out"""
         wf_service = netsvc.LocalService("workflow")
         for loan in self.browse(cr, uid, ids, context=context):
-            # we expect to get an invoice, a date and a payment method
-            # first set the data
             vals = {
                 'voucher_id': context.get('voucher_id'),
             }
@@ -224,9 +223,9 @@ class hr_loan(osv.osv):
                 mlids = [l.id for l in move.line_id]
                 mlids.reverse()
                 # Create voucher_lines
+                rec_ids = []
                 account_move_lines = move_line_obj.browse(cr, uid, mlids, context=context)
                 account_id = None
-                rec_ids = []
                 for line_id in account_move_lines:
                     if line_id.debit:
                         continue
@@ -242,26 +241,27 @@ class hr_loan(osv.osv):
                         'type': 'dr',
                         })
                 lines = [(0, 0, x) for x in lml]
-                # alright we have the lines. Now we replace in the voucher
+                # alright we have the lines. Now let's check if we have the right to move on
                 voucher = voucher_obj.browse(cr, uid, context.get('voucher_id'), context)
-                voucher_line_obj.unlink(cr, uid, [n.id for n in voucher.line_ids], context)
-                voucher_obj.write(cr, uid, [voucher.id], {'line_ids': lines}, context)
                 # now we need to recreate the reconcile if need be (voucher is not draft)
                 if rec_ids and voucher.move_id:
                     for line in voucher.move_id.line_id:
+                        if line.reconcile_id:
+                            raise osv.except_osv(
+                                _('Reconciliation Error'),
+                                _("Selected Voucher already reconciles another Journal Item" ))
                         if line.account_id.id == account_id:
-                            if line.reconcile_id:
-                                raise osv.except_osv(
-                                    _('Reconciliation Error'),
-                                    _("Selected Voucher already reconciles another Journal Item" ))
                             rec_ids.append(line.id)
-                    # go ahead and reconcile
-                    if len(rec_ids) >= 2:
-                        reconcile = move_line_obj.reconcile_partial(cr, uid, rec_ids, writeoff_acc_id=voucher.writeoff_acc_id.id, writeoff_period_id=voucher.period_id.id, writeoff_journal_id=voucher.journal_id.id)
-                    else:
+                    # check again that we can reconcile
+                    if len(rec_ids) < 2:
                         raise osv.except_osv(
                             _('Reconciliation Error'),
                             _("Selected Voucher does not match Loan's account" ))
+                    # all good, we can proceed
+                    voucher_line_obj.unlink(cr, uid, [n.id for n in voucher.line_ids], context)
+                    voucher_obj.write(cr, uid, [voucher.id], {'line_ids': lines}, context)
+                    # and reconcile
+                    reconcile = move_line_obj.reconcile_partial(cr, uid, rec_ids, writeoff_acc_id=voucher.writeoff_acc_id.id, writeoff_period_id=voucher.period_id.id, writeoff_journal_id=voucher.journal_id.id)
 
             #ok we're ready
             self.write(
@@ -414,7 +414,7 @@ class hr_loan_invoice(osv.osv_memory):
             required=True),
         'paymethod_id': fields.many2one(
             'account.journal',
-            'Payment method',
+            'Loan payment method',
             required=True),
     }
     _defaults = {
