@@ -96,6 +96,17 @@
       </field>
     </record>
 
+    <record id="view_hr_config_loan_invoice" model="ir.ui.view">
+      <field name="name">hr settings for loans</field>
+      <field name="inherit_id" ref="hr_loan.view_hr_config_loan"/>
+      <field name="model">hr.config.settings</field>
+      <field name="priority">30</field>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='default_loan_journal_id']" position="after">
+          <field name="default_loan_invoice_journal_id"/>
+        </xpath>
+      </field>
+    </record>
 
   </data>
 </openerp>

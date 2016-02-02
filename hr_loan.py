@@ -17,6 +17,43 @@ from openerp.tools.safe_eval import safe_eval as eval
 import logging
 _logger = logging.getLogger(__name__)
 
+class res_company(osv.osv):
+    _inherit = "res.company"
+
+    _columns = {
+        'default_loan_invoice_journal_id': fields.many2one('account.journal',
+            'The Invoice Payment method to use by default'),
+    }
+
+res_company()
+
+class hr_config_settings(osv.osv_memory):
+    _inherit = 'hr.config.settings'
+
+    _columns = {
+        'default_loan_invoice_journal_id': fields.related(
+            'company_id',
+            'default_loan_invoice_journal_id',
+            type='many2one',
+            relation='account.journal',
+            string="Invoice/Loan payment method"),
+    }
+
+    def onchange_company_id(self, cr, uid, ids, company_id, context=None):
+        # update related fields
+        val = super(hr_config_settings, self).onchange_company_id(cr, uid, ids, company_id, context=context)
+        if 'value' in val:
+            values = val.get('value')
+            values.update({
+                'default_loan_invoice_journal_id': False,
+            })
+            if company_id:
+                company = self.pool.get('res.company').browse(cr, uid, company_id, context=context)
+                values.update({
+                    'default_loan_invoice_journal_id': company.default_loan_invoice_journal_id and company.default_loan_invoice_journal_id.id or False,
+                })
+        return {'value': values}
+
 
 class hr_loan(osv.osv):
     '''Quick loan fixes'''
@@ -78,7 +115,6 @@ class hr_loan(osv.osv):
             # first set the data
             vals = {
                 'invoice_id': context.get('invoice_id'),
-                'move_id': context.get('move_id'),
                 'amount': context.get('amount'),
                 'nb_payments': context.get('nb_payments'),
                 'installment': context.get('installment'),
@@ -87,6 +123,17 @@ class hr_loan(osv.osv):
                 'user_valid': uid,
                 'is_advance': False, #no way this is an advance!
             }
+
+            vals['move_id'] = self._create_move(
+                cr, 
+                uid, 
+                loan.id,
+                loan.name,
+                loan.account_credit.id,
+                loan.account_debit.id,
+                context.get('date'),
+                context.get('amount'),
+                context=context)
 
             # make the payment
             vals['voucher_id'] = self._create_voucher(
@@ -364,6 +411,12 @@ class hr_loan_invoice(osv.osv_memory):
             return emp.address_home_id.id
         return False
 
+    def _get_journal(self, cr, uid, context=None):
+        user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
+        if user.company_id.default_loan_invoice_journal_id:
+            return user.company_id.default_loan_invoice_journal_id.id
+        return False
+
     def onchange_employee(self, cr, uid, ids, employee_partner_id, context=None):
         return {'value': {'partner_id': employee_partner_id}}
 
@@ -419,6 +472,7 @@ class hr_loan_invoice(osv.osv_memory):
     }
     _defaults = {
         'employee_partner_id': _get_partner,
+        'paymethod_id': _get_journal,
         'nb_payments': 1,
     }
 
