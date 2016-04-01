@@ -1,0 +1,34 @@
+<openerp>
+    <data noupdate="0">
+
+    <record id="view_school_student_registration_invoice_history" model="ir.ui.view">
+      <field name="name">school.student.form.history.inherit</field>
+      <field name="model">school.student</field>
+      <field name="inherit_id" ref="school.view_school_registration_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//page[@string='Relatives']" position="after">
+          <page string="Past Invoices">
+            <field name="invoice_ids"/>
+          </page>
+        </xpath>
+      </field>
+    </record>
+
+
+
+
+    <record id="view_school_enrolment_form_invoice" model="ir.ui.view">
+      <field name="name">school.enrolment.form.invoice.inherit</field>
+      <field name="model">school.enrolment</field>
+      <field name="inherit_id" ref="school.view_school_enrolment_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//page[@string='Checklist']" position="after">
+          <page string="Extra invoices">
+            <field name="invoice_ids"/>
+          </page>
+        </xpath>
+      </field>
+    </record>
+
+  </data>
+</openerp>

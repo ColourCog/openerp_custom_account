@@ -8,4 +8,4 @@ import account_voucher
 import account_invoice
 import account_move
 import account_move_line
-#~ import school
+import school

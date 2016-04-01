@@ -18,7 +18,7 @@
         "account_check_writing",
         "point_of_sale",
         "purchase",
-        #~ "school",
+        "school",
     ],
     "summary" : "Modifies standard OpenERP functionality",
     "description" : """
@@ -59,6 +59,7 @@ Extra features:
 * force invoices to update their status when paid
 * import voucher as loan give-out
 * default school data
+* reprocess school student workflow
     """,
     "data" : [
         "security/ir_rule.xml",
@@ -76,7 +77,8 @@ Extra features:
         "account_invoice_data.xml",
         "account_move_data.xml",
         "account_move_line_data.xml",
-        #~ "school_data.xml",
+        "school_data.xml",
+        "school_view.xml",
     ],
     "application": False,
     "installable": True
