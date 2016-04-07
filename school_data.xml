@@ -1,25 +1,260 @@
 <openerp>
-    <data noupdate="0">
+  <data noupdate="0">
 
     <record id="ir_actions_server_reprocess_students" model="ir.actions.server">
-            <field name="type">ir.actions.server</field>
-            <field name="model_id" ref="model_school_student"/>
-            <field name="name">Recreate student Workflow</field>
-            <field name="sequence" eval="5"/>
-            <field name="condition">True</field>
-            <field name="state">code</field>
-            <field name="code">self.batch_reprocess_workflow(cr, uid, context.get('active_ids', []),  context=context)</field>
-        </record>
+      <field name="type">ir.actions.server</field>
+      <field name="model_id" ref="model_school_student"/>
+      <field name="name">Recreate student Workflow</field>
+      <field name="sequence" eval="5"/>
+      <field name="condition">True</field>
+      <field name="state">code</field>
+      <field name="code">self.batch_reprocess_workflow(cr, uid, context.get('active_ids', []),  context=context)</field>
+    </record>
 
-        <record model="ir.values" id="action_batch_reprocess_students">
-            <field name="name">action_batch_reprocess_students</field>
-            <field name="action_id" ref="ir_actions_server_reprocess_students" />
-            <field name="value" eval="'ir.actions.server,' + str(ref('ir_actions_server_reprocess_students'))" />
-            <field name="key">action</field>
-            <field name="model_id" ref="model_school_student" />
-            <field name="model">school.student</field>
-            <field name="key2">client_action_multi</field>
-        </record>
+    <record model="ir.values" id="action_batch_reprocess_students">
+      <field name="name">action_batch_reprocess_students</field>
+      <field name="action_id" ref="ir_actions_server_reprocess_students" />
+      <field name="value" eval="'ir.actions.server,' + str(ref('ir_actions_server_reprocess_students'))" />
+      <field name="key">action</field>
+      <field name="model_id" ref="model_school_student" />
+      <field name="model">school.student</field>
+      <field name="key2">client_action_multi</field>
+    </record>
 
   </data>
+
+  <data noupdate="1">
+    <!-- Checklist -->
+    <record id="school_checklist_registration" model="school.checklist">
+        <field name="name">Registration</field>
+    </record>
+    <record id="school_checklist_enrolment" model="school.checklist">
+        <field name="name">Enrolment</field>
+    </record>
+
+    <!-- Checklist Items-->
+    <record id="school_checklist_item_certificate" model="school.checklist.item">
+        <field name="name">Birth Certificate</field>
+        <field name="checklist_id" ref="school_checklist_registration"/>
+    </record>
+    <record id="school_checklist_item_vaccination" model="school.checklist.item">
+        <field name="name">Vaccination card</field>
+        <field name="checklist_id" ref="school_checklist_registration"/>
+    </record>
+    <record id="school_checklist_item_schoolreports" model="school.checklist.item">
+        <field name="name">Previous school reports</field>
+        <field name="checklist_id" ref="school_checklist_registration"/>
+    </record>
+
+    <!-- Academic level-->
+    <record id="school_kindergarten" model="school.academic.year">
+        <field name="name">Playschool</field>
+    </record>
+    <record id="school_nursery" model="school.academic.year">
+        <field name="name">Nursery</field>
+    </record>
+    <record id="school_reception" model="school.academic.year">
+        <field name="name">Reception</field>
+    </record>
+    <record id="school_level_1" model="school.academic.year">
+        <field name="name">Year 1</field>
+    </record>
+    <record id="school_level_2" model="school.academic.year">
+        <field name="name">Year 2</field>
+    </record>
+    <record id="school_level_3" model="school.academic.year">
+        <field name="name">Year 3</field>
+    </record>
+    <record id="school_level_4" model="school.academic.year">
+        <field name="name">Year 4</field>
+    </record>
+    <record id="school_level_5" model="school.academic.year">
+        <field name="name">Year 5</field>
+    </record>
+    <record id="school_level_6" model="school.academic.year">
+        <field name="name">Year 6</field>
+    </record>
+    <record id="school_level_7" model="school.academic.year">
+        <field name="name">Year 7</field>
+    </record>
+    <record id="school_level_8" model="school.academic.year">
+        <field name="name">Year 8</field>
+    </record>
+    <record id="school_level_9" model="school.academic.year">
+        <field name="name">Year 9</field>
+    </record>
+    <record id="school_level_10" model="school.academic.year">
+        <field name="name">Year 10</field>
+    </record>
+    <record id="school_level_11" model="school.academic.year">
+        <field name="name">Year 11</field>
+    </record>
+    <record id="school_level_12" model="school.academic.year">
+        <field name="name">Year 12</field>
+    </record>
+    <record id="school_level_13" model="school.academic.year">
+        <field name="name">Year 13</field>
+    </record>
+
+    <!-- Religion-->
+    <record id="school_religion_agnostic" model="school.religion">
+        <field name="name">Agnostic</field>
+    </record>
+    <record id="school_religion_catholic" model="school.religion">
+        <field name="name">Catholic</field>
+    </record>
+    <record id="school_religion_methodist" model="school.religion">
+        <field name="name">Methodist</field>
+    </record>
+    <record id="school_religion_muslim" model="school.religion">
+        <field name="name">Muslim</field>
+    </record>
+    <record id="school_religion_budhism" model="school.religion">
+        <field name="name">Buddhist</field>
+    </record>
+    <record id="school_religion_hinduist" model="school.religion">
+        <field name="name">Hinduist</field>
+    </record>
+    <record id="school_religion_atheist" model="school.religion">
+        <field name="name">Atheist</field>
+    </record>
+
+    <!-- Language-->
+    <record id="school_language_english_uk" model="school.language">
+        <field name="name">English (UK)</field>
+    </record>
+    <record id="school_language_english_us" model="school.language">
+        <field name="name">English (US)</field>
+    </record>
+    <record id="school_language_french" model="school.language">
+        <field name="name">French</field>
+    </record>
+    <record id="school_language_spanish" model="school.language">
+        <field name="name">Spanish</field>
+    </record>
+    <record id="school_language_portuguese" model="school.language">
+        <field name="name">Portuguese</field>
+    </record>
+    <record id="school_language_german" model="school.language">
+        <field name="name">German</field>
+    </record>
+    <record id="school_language_arabic" model="school.language">
+        <field name="name">Arabic</field>
+    </record>
+
+    <!-- Subjects -->
+    <record id="school_subject_art" model="school.subject">
+        <field name="name">Art</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_artcraft" model="school.subject">
+        <field name="name">Art &amp; Craft</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_biology" model="school.subject">
+        <field name="name">Biology</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_biologyadv" model="school.subject">
+        <field name="name">Biology Advanced</field>
+        <field name="grading_method">numeric</field>
+    </record>
+    <record id="school_subject_business" model="school.subject">
+        <field name="name">Business Studies</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_chemistry" model="school.subject">
+        <field name="name">Chemistry</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_chemistryadv" model="school.subject">
+        <field name="name">Chemistry Advanced</field>
+        <field name="grading_method">numeric</field>
+    </record>
+    <record id="school_subject_dance" model="school.subject">
+        <field name="name">Dance</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_economicsadv" model="school.subject">
+        <field name="name">Economics Advanced</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_enggram" model="school.subject">
+        <field name="name">English - Composition &amp; Grammar</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_engread" model="school.subject">
+        <field name="name">English - Reading &amp; Comprehension</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_engwrit" model="school.subject">
+        <field name="name">English - Spelling &amp; Handwriting</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_englang" model="school.subject">
+        <field name="name">English Language</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_englit" model="school.subject">
+        <field name="name">English Literature</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_french" model="school.subject">
+        <field name="name">French</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_geo" model="school.subject">
+        <field name="name">Geography</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_glopers" model="school.subject">
+        <field name="name">Global Perspectives Advanced</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_history" model="school.subject">
+        <field name="name">History</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_maths" model="school.subject">
+        <field name="name">Mathematics</field>
+        <field name="grading_method">numeric</field>
+    </record>
+    <record id="school_subject_mathsadv" model="school.subject">
+        <field name="name">Mathematics Advanced</field>
+        <field name="grading_method">numeric</field>
+    </record>
+    <record id="school_subject_music" model="school.subject">
+        <field name="name">Music</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_physed" model="school.subject">
+        <field name="name">Physical Education</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_physics" model="school.subject">
+        <field name="name">Physics</field>
+        <field name="grading_method">numeric</field>
+    </record>
+    <record id="school_subject_physicsadv" model="school.subject">
+        <field name="name">Physics Advanced</field>
+        <field name="grading_method">numeric</field>
+    </record>
+    <record id="school_subject_science" model="school.subject">
+        <field name="name">Science</field>
+        <field name="grading_method">numeric</field>
+    </record>
+    <record id="school_subject_engspec" model="school.subject">
+        <field name="name">Special English</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_games" model="school.subject">
+        <field name="name">Swimming, Games &amp; Tennis</field>
+        <field name="grading_method">alpha</field>
+    </record>
+    <record id="school_subject_topic" model="school.subject">
+        <field name="name">Topic</field>
+        <field name="grading_method">alpha</field>
+    </record>
+  </data>
+
 </openerp>
