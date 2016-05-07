@@ -77,7 +77,7 @@ Extra features:
         "account_invoice_data.xml",
         "account_move_data.xml",
         "account_move_line_data.xml",
-        "school_data.xml",
+        #~ "school_data.xml",
         "school_view.xml",
     ],
     "application": False,

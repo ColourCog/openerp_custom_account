@@ -23,7 +23,7 @@
 
   </data>
 
-  <data noupdate="1">
+  <data noupdate="0">
     <!-- Checklist -->
     <record id="school_checklist_registration" model="school.checklist">
         <field name="name">Registration</field>
