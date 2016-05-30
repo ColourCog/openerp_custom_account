@@ -17,6 +17,24 @@ from openerp.tools.safe_eval import safe_eval as eval
 import logging
 _logger = logging.getLogger(__name__)
 
+class school_academic_year(osv.osv):
+    _name = 'school.academic.year'
+    _inherit = 'school.academic.year'
+
+    _columns = {
+        'report_type': fields.selection([
+            ('infant', 'Infant Report'),
+            ('junior', 'Junior Report'),
+            ('senior', 'Senior Report')],
+            'Type of report to use',
+            required=True),
+    }
+    _defaults = {
+        'report_type': 'junior',
+    }
+
+school_academic_year()
+
 class school_student(osv.osv):
     _name = 'school.student'
     _inherit = 'school.student'

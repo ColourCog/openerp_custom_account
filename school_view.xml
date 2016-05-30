@@ -30,5 +30,20 @@
       </field>
     </record>
 
+
+
+    <record id="view_school_academic_year_report_types" model="ir.ui.view">
+      <field name="name">school.academic.year.form.report.inherit</field>
+      <field name="model">school.academic.year</field>
+      <field name="inherit_id" ref="school.view_school_academic_year_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='tuition_fee_id']" position="after">
+            <field name="report_type" />
+        </xpath>
+      </field>
+    </record>
+
+
+
   </data>
 </openerp>
