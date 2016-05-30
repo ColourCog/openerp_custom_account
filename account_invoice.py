@@ -234,7 +234,7 @@ class account_invoice(osv.osv):
                         cr)
             if inv.state != 'paid':
                 real_ids.append(inv.id)
-        return self._create_cash_voucher(cr, uid, real_ids, context=context)
+        return self._create_uba_voucher(cr, uid, real_ids, context=context)
 
     def _create_uba_voucher(self, cr, uid, ids, context):
         ctx = context.copy()
