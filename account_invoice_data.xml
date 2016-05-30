@@ -43,5 +43,25 @@
             <field name="key2">client_action_multi</field>
         </record>
 
+    <record id="ir_actions_server_pay_charges_on_date" model="ir.actions.server">
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_account_invoice"/>
+            <field name="name">Pay Bank Charges on Invoice Date</field>
+            <field name="sequence" eval="7"/>
+            <field name="condition">True</field>
+            <field name="state">code</field>
+            <field name="code">self.invoice_pay_bank_charges(cr, uid, context.get('active_ids', []),  context=context)</field>
+        </record>
+
+        <record model="ir.values" id="action_batch_pay_charges_on_date">
+            <field name="name">action_batch_pay_charges_on_date</field>
+            <field name="action_id" ref="ir_actions_server_pay_charges_on_date" />
+            <field name="value" eval="'ir.actions.server,' + str(ref('ir_actions_server_pay_charges_on_date'))" />
+            <field name="key">action</field>
+            <field name="model_id" ref="model_account_invoice" />
+            <field name="model">account.invoice</field>
+            <field name="key2">client_action_multi</field>
+        </record>
+
   </data>
 </openerp>
