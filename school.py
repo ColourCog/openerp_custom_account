@@ -41,15 +41,31 @@ class school_student(osv.osv):
 
     def batch_reprocess_workflow(self, cr, uid, ids, context=None):
         wf_service = netsvc.LocalService("workflow")
+        signal_map = {
+            'draft': 'draft',
+            'student': 'validate',
+            'enrolled': 'enroll',
+            'cancel': 'cancel',
+            'suspend':'suspend'
+        }
         for student in self.browse(cr, uid, ids, context=context):
             target_state = student.state
             #~ self.write(cr, uid, [student.id], {'state':'draft'}, context=context)
             wf_service.trg_delete(uid, 'school.student', student.id, cr)
             wf_service.trg_create(uid, 'school.student', student.id, cr)
             for state in ['draft', 'student', 'enrolled', 'suspend']:
-                wf_service.trg_validate(uid, 'school.student', student.id, state, cr)
+                if student.current_class_id and state == 'suspend':
+                    break
+                if not student.current_class_id and state == 'enrolled':
+                    break
+                wf_service.trg_validate(
+                    uid,
+                    'school.student',
+                    student.id,
+                    signal_map.get(state),
+                    cr)
                 if state == target_state:
-                    continue
+                    break
         return ids
 
     _columns = {
