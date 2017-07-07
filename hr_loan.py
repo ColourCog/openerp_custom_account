@@ -125,8 +125,8 @@ class hr_loan(osv.osv):
             }
 
             vals['move_id'] = self._create_move(
-                cr, 
-                uid, 
+                cr,
+                uid,
                 loan.id,
                 loan.name,
                 loan.account_credit.id,
@@ -330,7 +330,7 @@ class hr_loan(osv.osv):
         voucher_obj = self.pool.get('account.voucher')
         slip_obj = self.pool.get('hr.payslip')
         for loan in self.browse(cr, uid, ids, context=context):
-            if loan.voucher_id:
+            if loan.voucher_id and loan.voucher_id.partner_id == loan.employee_id.address_home_id:
                 voucher_obj.cancel_voucher(
                     cr,
                     uid,
@@ -350,23 +350,25 @@ class hr_loan(osv.osv):
                     [loan.id],
                     {'invoice_id': False, 'move_id': False},
                     context=context)
-                if loan.hidden_move_id:
+                if loan.hidden_move_id and loan.hidden_move_id.partner_id == loan.employee_id.address_home_id:
                     move_obj.unlink(
                         cr,
                         uid,
                         [loan.hidden_move_id.id],
                         context=context)
-            if loan.move_id and not loan.invoice_id:
+            if loan.move_id and not loan.invoice_id and loan.move_id.partner_id == loan.employee_id.address_home_id:
                 move_obj.unlink(
                     cr,
                     uid,
                     [loan.move_id.id],
                     context=context)
             if loan.payment_ids:
-                slips = [p.slip_id.id for p in loan.payment_ids]
+                slips = [p.slip_id.id for p in loan.payment_ids if p.slip_id.employee_id == loan.employee_id]
                 slip_obj.cancel_sheet(cr, uid, slips, context=context)
+                l = [p.id for p in loan.payment_ids]
+                pay_obj.unlink(cr, uid, l, context=context)
             if loan.voucher_ids:
-                vouchers = [v.id for v in loan.voucher_ids]
+                vouchers = [v.id for v in loan.voucher_ids if v.partner_id == loan.employee_id.address_home_id]
                 voucher_obj.cancel_voucher(
                     cr,
                     uid,
@@ -380,7 +382,7 @@ class hr_loan(osv.osv):
                     {'voucher_ids': []},
                     context=context)
             if loan.move_ids:
-                l = [p.id for p in loan.move_ids]
+                l = [p.id for p in loan.move_ids if p.partner_id == loan.employee_id.address_home_id]
                 move_obj.unlink(cr, uid, l, context=context)
                 self.write(
                     cr,
